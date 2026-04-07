@@ -4,7 +4,7 @@ from discord.ext import commands
 from constants.shellshuckle_constants import CC_SERVER_ID, POKEMEOW_APPLICATION_ID
 from utils.listener_func.icon_unlock_listener import icon_unlock_listener
 from utils.logs.pretty_log import pretty_log
-
+from utils.listener_func.wb_rs import handle_wb_rewards
 triggers = {
     "icon_unlock": "as your icon with `/battle set-icon",
 }
@@ -68,11 +68,19 @@ class MessageCreateListener(commands.Cog):
                 message=f"Detected icon unlock message in {message.channel.name}",
             )
             await icon_unlock_listener(self.bot, message)
-
+        # ————————————————————————————————
+        # 🐢 World Boss Rewards Handler
+        # ————————————————————————————————
+        if first_embed:
+            if "Here are your rewards" in first_embed_title and "Boss id:" in first_embed_title:
+                pretty_log(
+                    tag="info",
+                    message=f"Detected world boss rewards message in {message.channel.name}",
+                )
+                await handle_wb_rewards(self.bot, message)
 
 # 🟣────────────────────────────────────────────
 #         🐢 Setup Function
 # 🟣────────────────────────────────────────────
 async def setup(bot: commands.Bot):
     await bot.add_cog(MessageCreateListener(bot))
-
