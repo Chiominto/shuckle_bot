@@ -59,7 +59,7 @@ class OnGuildJoinCog(commands.Cog):
                         description=(
                             f"Hello! I am {bot_name}, a bot primarily designed for the {main_guild.name} server. "
                             f"It seems that I have joined your guild '{guild.name}', but I am not intended to operate outside of my main server.\n\n"
-                            f"As such, I will be leaving your guild shortly. If you believe this is a mistake or would like to discuss further, please contact my owner: Yuki - {bot_owner.mention}."
+                            f"As such, I will be leaving your guild shortly. If you believe this is a mistake or would like to discuss further, please contact my owner: Burger - {bot_owner.mention}."
                         ),
                         color=discord.Color.red(),
                     )
