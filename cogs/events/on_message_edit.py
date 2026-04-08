@@ -1,12 +1,13 @@
 import discord
 from discord.ext import commands
 
-from constants.shellshuckle_constants import CC_SERVER_ID, POKEMEOW_APPLICATION_ID
+from constants.celestial_constants import CC_SERVER_ID, POKEMEOW_APPLICATION_ID
 from utils.logs.pretty_log import pretty_log
 
 triggers = {
     "icon_unlock": "as your icon with `/battle set-icon",
 }
+
 
 # 🟣────────────────────────────────────────────
 #         🐢 Message Edit Listener Cog
@@ -56,6 +57,7 @@ class OnMessageEditCog(commands.Cog):
             and not after.webhook_id
         ):
             return
+
 
 # 🟣────────────────────────────────────────────
 #         🐢 Setup Function

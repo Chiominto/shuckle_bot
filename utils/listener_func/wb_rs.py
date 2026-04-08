@@ -2,19 +2,17 @@ import re
 from datetime import datetime
 
 import discord
-from utils.logs.debug_log import debug_log, enable_debug
 
-from constants.shellshuckle_constants import (
-    DEFAULT_EMBED_COLOR,
-    SHELLSHUCKLE_TEXT_CHANNELS,
-)
-from utils.functions.webhook_func import send_webhook
-from utils.logs.pretty_log import pretty_log
 from constants.aesthetics import *
+from constants.celestial_constants import CELESTIAL_TEXT_CHANNELS, DEFAULT_EMBED_COLOR
 from constants.wb_constants import *
+from utils.functions.webhook_func import send_webhook
+from utils.logs.debug_log import debug_log, enable_debug
+from utils.logs.pretty_log import pretty_log
+
 # 🎯 Define your criteria
 SPECIAL_POKEMON_KEYWORDS = {"Shiny", "Gigantamax"}  # keywords to look for
-RARE_SPAWN_CHANNEL_ID = SHELLSHUCKLE_TEXT_CHANNELS.battle_unlocks
+RARE_SPAWN_CHANNEL_ID = CELESTIAL_TEXT_CHANNELS.battle_unlocks
 
 
 SPECIAL_ITEMS = {
@@ -59,12 +57,13 @@ def get_gmax_assets(name: str, shiny: bool = False) -> dict[str, str | int] | No
     if not sprite or not emoji or not color:
         return None
 
-
     return {
         "sprite": sprite,
         "emoji": emoji,
         "color": color,
     }
+
+
 # ─────────────────────────────
 # 🔹 Helper: Extract base species from a Pokémon name
 # ─────────────────────────────
@@ -128,7 +127,6 @@ async def handle_wb_rewards(
 ):
     try:
         debug_log("Entered handle_wb_rewards()", highlight=True)
-
 
         # 🛑 Only process PokéMeow bot messages
         author_str = str(message.author).lower()
@@ -329,7 +327,12 @@ async def handle_wb_rewards(
             if damage_text or placement_text
             else "💥 Damage dealt: | 🏅 Placed:"
         )
-        new_embed.set_footer(text=footer_text, icon_url=message.guild.icon.url if message.guild and message.guild.icon else None)
+        new_embed.set_footer(
+            text=footer_text,
+            icon_url=(
+                message.guild.icon.url if message.guild and message.guild.icon else None
+            ),
+        )
 
         # Send embed
         log_channel = bot.get_channel(RARE_SPAWN_CHANNEL_ID)

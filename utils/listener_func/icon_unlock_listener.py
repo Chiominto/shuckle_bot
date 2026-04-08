@@ -3,10 +3,7 @@ from datetime import datetime
 
 import discord
 
-from constants.shellshuckle_constants import (
-    DEFAULT_EMBED_COLOR,
-    SHELLSHUCKLE_TEXT_CHANNELS,
-)
+from constants.celestial_constants import CELESTIAL_TEXT_CHANNELS, DEFAULT_EMBED_COLOR
 from utils.functions.webhook_func import send_webhook
 from utils.logs.pretty_log import pretty_log
 
@@ -45,7 +42,7 @@ async def icon_unlock_listener(bot: discord.Client, message: discord.Message):
     if not member:
         return
 
-    battle_unlock_channel = guild.get_channel(SHELLSHUCKLE_TEXT_CHANNELS.battle_unlocks)
+    battle_unlock_channel = guild.get_channel(CELESTIAL_TEXT_CHANNELS.battle_unlocks)
     if not battle_unlock_channel:
         pretty_log(
             "error",

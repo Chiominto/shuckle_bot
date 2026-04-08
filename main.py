@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 from utils.cache.central_cache_loader import load_all_cache
 from utils.db.get_pg_pool import get_pg_pool
 from utils.logs.pretty_log import pretty_log, set_bot
+from utils.background_tasks.scheduled_tasks.scheduler import setup_schedulers
+from utils.functions.persist_views import register_persistent_views
 
 # ---- Intents / Bot ----
 intents = discord.Intents.default()
@@ -117,6 +119,11 @@ async def main():
     load_dotenv()
     pretty_log("ready", "Shuckle Bot is starting...")
 
+    # Register persistent views (buttons)
+    await register_persistent_views(bot)
+
+    # Setup scheduled tasks
+    await setup_schedulers(bot)
     retry_delay = 5
     while True:
         try:

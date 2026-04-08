@@ -18,3 +18,6 @@ class Emojis:
     Common = "<:Common:1490933917035921490>"
     metronome = "<:metronome:1490941485812551780>"
     World_boss_Spawn = "<:World_boss_Spawn:1490907693265981560>"
+
+class Thumbnails:
+    BATTLE_TOWER = "https://media.discordapp.net/attachments/1394913073520967680/1420593124379459605/image.png?ex=68d5f5f2&is=68d4a472&hm=2848b1f5b21259c320e3a46fc83368c251b18f7b5b7e3cc5e271581bd583f2a5&=&format=webp&quality=lossless&width=576&height=576"

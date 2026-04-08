@@ -4,12 +4,14 @@ POKEMEOW_APPLICATION_ID = 664508672713424926
 CC_SERVER_ID = 1220718310455250996
 KHY_USER_ID = 952071312124313611
 BURGER_USER_ID = 682429434720288797
-SHELL_SHUCKLE_SERVER_ID = 1490116594884411402
+CELESTIAL_SERVER_ID = 1490116594884411402
+
 
 # 💦☁────────────────────────────────────────────💦☁
-#       SHELLSHUCKLE_TEXT_CHANNELS
+#       CELESTIAL_TEXT_CHANNELS
 # 💦☁────────────────────────────────────────────💦☁
-class SHELLSHUCKLE_TEXT_CHANNELS:
+class CELESTIAL_TEXT_CHANNELS:
+    bumps = 1491445438258352320
 
     # 🌊💙🤍───────────── Admin ─────────────💙🤍🌊
 
@@ -58,9 +60,9 @@ class SHELLSHUCKLE_TEXT_CHANNELS:
 
 
 # 💦☁────────────────────────────────────────────💦☁
-#       SHELLSHUCKLE_VOICE_CHANNELS
+#       CELESTIAL_VOICE_CHANNELS
 # 💦☁────────────────────────────────────────────💦☁
-class SHELLSHUCKLE_VOICE_CHANNELS:
+class CELESTIAL_VOICE_CHANNELS:
 
     # 🌊💙🤍───────────── Voice_Channels ─────────────💙🤍🌊
 
@@ -69,9 +71,9 @@ class SHELLSHUCKLE_VOICE_CHANNELS:
 
 
 # 💦☁────────────────────────────────────────────💦☁
-#       SHELLSHUCKLE_CATEGORIES
+#       CELESTIAL_CATEGORIES
 # 💦☁────────────────────────────────────────────💦☁
-class SHELLSHUCKLE_CATEGORIES:
+class CELESTIAL_CATEGORIES:
 
     ADMIN = 1490598993393352704
     MARKET = 1490875682639843461
@@ -82,10 +84,11 @@ class SHELLSHUCKLE_CATEGORIES:
 
 
 # 💦☁────────────────────────────────────────────💦☁
-#       SHELLSHUCKLE_ROLES
+#       CELESTIAL_ROLES
 # 💦☁────────────────────────────────────────────💦☁
-class SHELLSHUCKLE_ROLES:
-
+class CELESTIAL_ROLES:
+    os_lottery = 1491449796320559175
+    battle_tower = 1491449861642649680
     _unknown = 1490876248577020086
     pokémeow = 1490117261824884991
     meowhelper = 1490157032890699829
@@ -118,8 +121,8 @@ class SHELLSHUCKLE_ROLES:
 
 
 # 💦☁────────────────────────────────────────────💦☁
-#       SHELLSHUCKLE_EMOJIS
+#       CELESTIAL_EMOJIS
 # 💦☁────────────────────────────────────────────💦☁
-class SHELLSHUCKLE_EMOJIS:
+class CELESTIAL_EMOJIS:
 
     lordfry = "<:LordFry:1490453099008102410>"
