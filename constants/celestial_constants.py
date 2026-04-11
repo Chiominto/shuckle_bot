@@ -87,6 +87,7 @@ class CELESTIAL_CATEGORIES:
 #       CELESTIAL_ROLES
 # 💦☁────────────────────────────────────────────💦☁
 class CELESTIAL_ROLES:
+    staff = 1492431851573481533
     os_lottery = 1491449796320559175
     battle_tower = 1491449861642649680
     _unknown = 1490876248577020086
