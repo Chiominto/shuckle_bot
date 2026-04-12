@@ -81,7 +81,7 @@ async def dm_member(
                     )
                     break
     # Final attempt: Send to a public channel in the celestial guild, retry once if rate limited
-    fallback_channel = celestial_guild.get_channel(CELESTIAL_TEXT_CHANNELS.shuckle_swamp)
+    fallback_channel = celestial_guild.get_channel(CELESTIAL_TEXT_CHANNELS.shuckles_swamp)
     if fallback_channel:
         for attempt in range(2):
             try:
@@ -112,5 +112,5 @@ async def dm_member(
     else:
         pretty_log(
             tag="error",
-            message=f"Failed to find fallback channel with ID {CELESTIAL_TEXT_CHANNELS.shuckle_swamp} in celestial guild for member {member} (ID: {member.id}). All DM attempts failed.",
-        )           
+            message=f"Failed to find fallback channel with ID {CELESTIAL_TEXT_CHANNELS.shuckles_swamp} in celestial guild for member {member} (ID: {member.id}). All DM attempts failed.",
+        )
