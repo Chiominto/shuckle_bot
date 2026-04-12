@@ -1,4 +1,7 @@
 class Emojis:
+    loading = "<a:colorful_loading:1324199044456779807>"
+    check = "<a:green_check:1308730918692851733>"
+    error = "<:cross_cross:1312575756110397501>"
     shinygigantamax = "<:shinygigantamax:1490907719077728439>"
     loaded_dice = "<:loaded_dice:1490907708038320218>"
     choice_cloak = "<:choice_cloak:1490907729836114032>"
@@ -18,7 +21,9 @@ class Emojis:
     Common = "<:Common:1490933917035921490>"
     metronome = "<:metronome:1490941485812551780>"
     World_boss_Spawn = "<:World_boss_Spawn:1490907693265981560>"
+    pokecoin = "<:PokeCoin:1349767346641698866>"
 
+    
 class Thumbnails:
     BATTLE_TOWER = "https://media.discordapp.net/attachments/1394913073520967680/1420593124379459605/image.png?ex=68d5f5f2&is=68d4a472&hm=2848b1f5b21259c320e3a46fc83368c251b18f7b5b7e3cc5e271581bd583f2a5&=&format=webp&quality=lossless&width=576&height=576"
     command = "https://media.discordapp.net/attachments/1393740397905313912/1492443708900249650/image.png?ex=69db5a04&is=69da0884&hm=ac848a967c1eb849cb32221a21451f82f828ba66f9f771cd285e9bc0b106135b&=&format=webp&quality=lossless&width=480&height=480"

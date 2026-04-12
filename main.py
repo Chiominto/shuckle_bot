@@ -21,6 +21,34 @@ bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 set_bot(bot)
 
 
+# ❀───────────────────────────────❀
+#   💖  App Command Error Handler 💖
+# ❀───────────────────────────────❀
+@bot.tree.error
+async def on_app_command_error(interaction, error):
+    from utils.functions.role_checks import (
+        OwnerCoownerCheckFailure,
+        StaffCheckFailure,
+    )
+
+    if isinstance(error, OwnerCoownerCheckFailure):
+        await interaction.response.send_message(str(error), ephemeral=True)
+    elif isinstance(error, StaffCheckFailure):
+        await interaction.response.send_message(str(error), ephemeral=True)
+
+    elif isinstance(error, app_commands.CheckFailure):
+        await interaction.response.send_message(
+            "You don't have permission to use this command.", ephemeral=True
+        )
+    else:
+        await interaction.response.send_message("An error occurred.", ephemeral=True)
+    pretty_log(
+        tag="info",
+        message=f"App command error: {error}",
+        include_trace=True,
+    )
+
+
 # 🟣────────────────────────────────────────────
 #         ⚡ Hourly Cache Refresh Task ⚡
 # 🟣────────────────────────────────────────────

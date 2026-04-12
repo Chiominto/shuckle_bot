@@ -280,13 +280,13 @@ async def handle_wb_rewards(
 
         if found_items:
             new_embed.add_field(
-                name=f"{Emojis.blue_gift} Item(s):",
+                name=f"🎁 Item(s):",
                 value="\n".join(f"> {emoji} {name}" for emoji, name in found_items),
                 inline=False,
             )
         if display_pokemon:
             new_embed.add_field(
-                name=f"{Emojis.Moving_Pokeball} Pokémon:",
+                name=f"🎊 Pokémon:",
                 value="\n".join(f"> {poke}" for poke in display_pokemon),
                 inline=False,
             )

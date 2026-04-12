@@ -5,7 +5,7 @@ import discord
 from utils.cache.cache_list import webhook_url_cache
 from utils.db.webhook_db_url import upsert_webhook_url
 from utils.logs.pretty_log import pretty_log
-
+from constants.celestial_constants import CELESTIAL_SERVER_ID, CELESTIAL_TEXT_CHANNELS
 
 async def create_webhook_func(
     bot, channel: discord.TextChannel, name: str
@@ -73,3 +73,22 @@ async def send_webhook(
     if webhook_url:
         webhook = discord.Webhook.from_url(webhook_url, client=bot)
         await webhook.send(content=content, embed=embed, wait=True)
+
+
+async def send_server_log(bot:discord.Client, content: str = None, embed: discord.Embed = None):
+    celestial_server = bot.get_guild(CELESTIAL_SERVER_ID)
+    if not celestial_server:
+        pretty_log(
+            "error",
+            f"Failed to fetch celestial server with ID {CELESTIAL_SERVER_ID} for server log",
+        )
+        return
+    server_logs_channel_id = CELESTIAL_TEXT_CHANNELS.server_logs
+    server_logs_channel = celestial_server.get_channel(server_logs_channel_id)
+    if not server_logs_channel:
+        pretty_log(
+            "error",
+            f"Failed to fetch server logs channel with ID {server_logs_channel_id} for server log",
+        )
+        return
+    await send_webhook(bot, server_logs_channel, content=content, embed=embed)
