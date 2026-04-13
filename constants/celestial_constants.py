@@ -15,7 +15,7 @@ CC_BUMP_CHANNEL_ID = 1396329392208089180
 class CELESTIAL_TEXT_CHANNELS:
 
     # 🌊💙🤍───────────── Admin ─────────────💙🤍🌊
-
+    roles_breakdown = 1492921526591291563
     moderator_only = 1490470353099817033
     server_logs = 1490599209940947035
     message_logs = 1490599308012290138
@@ -108,7 +108,7 @@ class CELESTIAL_CATEGORIES:
 #       CELESTIAL_ROLES
 # 💦☁────────────────────────────────────────────💦☁
 class CELESTIAL_ROLES:
-
+    giveaways = 1493045397575438470
     _unknown = 1490876248577020086
     pokémeow = 1490117261824884991
     meowhelper = 1490157032890699829

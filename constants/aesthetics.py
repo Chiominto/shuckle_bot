@@ -22,8 +22,12 @@ class Emojis:
     metronome = "<:metronome:1490941485812551780>"
     World_boss_Spawn = "<:World_boss_Spawn:1490907693265981560>"
     pokecoin = "<:PokeCoin:1349767346641698866>"
+    pokeball = "<:pokeball:1491304069875372042>"
+    greatball = "<:greatball:1491304121922359346>"
+    ultraball = "<:ultraball:1491304148640206928>"
+    premierball = "<:premierball:1491304182135914667>"
+    masterball = "<:masterball:1491304329066578093>"
 
-    
 class Thumbnails:
     BATTLE_TOWER = "https://media.discordapp.net/attachments/1394913073520967680/1420593124379459605/image.png?ex=68d5f5f2&is=68d4a472&hm=2848b1f5b21259c320e3a46fc83368c251b18f7b5b7e3cc5e271581bd583f2a5&=&format=webp&quality=lossless&width=576&height=576"
     command = "https://media.discordapp.net/attachments/1393740397905313912/1492443708900249650/image.png?ex=69db5a04&is=69da0884&hm=ac848a967c1eb849cb32221a21451f82f828ba66f9f771cd285e9bc0b106135b&=&format=webp&quality=lossless&width=480&height=480"
