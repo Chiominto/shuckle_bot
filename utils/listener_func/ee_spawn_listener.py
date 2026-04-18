@@ -32,7 +32,7 @@ enable_debug(f"{__name__}.check_cc_bump_reminder")
 wb_shared_cooldowns: dict[int, float] = {}  # {guild_id: last_post_time}
 cc_shared_cooldowns: dict[int, float] = {}  # {guild_id: last_post_time}
 # -------------------- Persistent cache --------------------
-CACHE_FILE = "Data/ee_votes_cache.json"
+CACHE_FILE = "constants/ee_votes_cache.json"
 
 last_seen_votes = {}
 near_spawn_alert_cache = set()
