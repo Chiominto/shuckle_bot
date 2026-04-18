@@ -14,13 +14,14 @@ from utils.listener_func.shiny_bonus_listener import (
     handle_pokemeow_global_bonus,
     read_shiny_bonus_timestamp_from_cc_channel,
 )
-
+from utils.listener_func.code_use_listener import send_code_claim_to_rs
 triggers = {
     "icon_unlock": "as your icon with `/battle set-icon",
     "global_bonus": "Global bonuses",
     "wb_spawn": "spawned a world boss using 1x <:boss_coin:1249165805095092356>",
     "wb_command": "a world boss has spawned! register now!",
     "ee_vote_checker": "there is no active world boss",
+    "code_use": "<:checkedbox:752302633141665812> you used a code to claim a :gift:",
 }
 
 CC_SHINY_BONUS_CHANNEL_ID = 1457171231445876746
@@ -170,6 +171,24 @@ class MessageCreateListener(commands.Cog):
                 )
                 await extract_boss_from_wb_spawn_command(
                     bot=self.bot, message=message
+                )
+
+        # ————————————————————————————————
+        # 🐢 Code Claim Listener
+        # ————————————————————————————————
+        if triggers["code_use"].lower() in content:
+            try:
+                await send_code_claim_to_rs(bot=self.bot, message=message)
+                pretty_log(
+                    "ready",
+                    f"Successfully processed code claim from message ID {getattr(message, 'id', 'unknown')}",
+
+                )
+            except Exception as e:
+                pretty_log(
+                    "critical",
+                    f"Failed processing code claim from message ID {getattr(message, 'id', 'unknown')}: {e}",
+
                 )
 # 🟣────────────────────────────────────────────
 #         🐢 Setup Function
