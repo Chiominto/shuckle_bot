@@ -339,7 +339,7 @@ async def handle_wb_rewards(
         if log_channel:
             await send_webhook(
                 bot=bot,
-                channel_id=log_channel.id,
+                channel=log_channel,
                 embed=new_embed,
             )
         else:
