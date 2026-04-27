@@ -3,9 +3,9 @@ from discord import app_commands
 from discord.ext import commands
 
 from group_commands_func.staff import *
-
 from utils.functions.command_safe import run_command_safe
 from utils.functions.role_checks import owner_and_co_owner_only, staff_only
+
 
 class StaffGroup(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -37,7 +37,7 @@ class StaffGroup(commands.Cog):
         user_id: str | None = None,
         reason: str | None = None,
     ):
-        slash_cmd_name = "co-owner ban"
+        slash_cmd_name = "staff ban"
 
         # Call the centralized preban logic
         await run_command_safe(
@@ -72,7 +72,7 @@ class StaffGroup(commands.Cog):
         user_id: str | None = None,
         reason: str | None = None,
     ):
-        slash_cmd_name = "co-owner unban"
+        slash_cmd_name = "staff unban"
 
         # Call the centralized unban logic
         await run_command_safe(
@@ -84,6 +84,7 @@ class StaffGroup(commands.Cog):
             user_id=user_id,
             reason=reason,
         )
+
     unban.extras = {"category": "Staff"}
 
     # 🤍───────────────────────────────────────
@@ -102,7 +103,7 @@ class StaffGroup(commands.Cog):
         interaction: discord.Interaction,
         role: discord.Role,
     ):
-        slash_cmd_name = "role-members"
+        slash_cmd_name = "staff role-members"
 
         # Call the centralized role members logic
         await run_command_safe(
@@ -112,6 +113,7 @@ class StaffGroup(commands.Cog):
             command_func=role_members_func,  # your main logic lives here
             role=role,
         )
+
     role_members.extras = {"category": "Staff"}
 
     # 🤍───────────────────────────────────────
@@ -132,7 +134,7 @@ class StaffGroup(commands.Cog):
         user: discord.Member | None = None,
         user_id: str | None = None,
     ):
-        slash_cmd_name = "whois"
+        slash_cmd_name = "staff whois"
 
         # Call the centralized whois logic
         await run_command_safe(
@@ -143,7 +145,53 @@ class StaffGroup(commands.Cog):
             user=user,
             user_id=user_id,
         )
+
     whois.extras = {"category": "Staff"}
+
+    # 🤍───────────────────────────────────────
+    # 📌 /staff update-member
+    # 🤍───────────────────────────────────────
+    @staff.command(
+        name="update-member",
+        description="Update a member's information in the database.",
+    )
+    @staff_only()
+    @app_commands.describe(
+        member="The member to update",
+        new_name="New Discord name for the member",
+        new_pokemeow_name="New PokéMeow name for the member",
+        new_channel="New personal channel for the member",
+        new_clan_bank_donations="Updated clan bank donations",
+        new_clan_treasury_donations="Updated clan treasury donation",
+    )
+    async def update_member(
+        self,
+        interaction: discord.Interaction,
+        member: discord.Member,
+        new_name: str | None = None,
+        new_pokemeow_name: str | None = None,
+        new_channel: discord.TextChannel | None = None,
+        new_clan_bank_donations: str | None = None,
+        new_clan_treasury_donations: str | None = None,
+    ):
+        slash_cmd_name = "staff update-member"
+
+        # Call the centralized update member logic
+        await run_command_safe(
+            bot=self.bot,
+            interaction=interaction,
+            slash_cmd_name=slash_cmd_name,
+            command_func=update_member_func,  # your main logic lives here
+            member=member,
+            new_name=new_name,
+            new_pokemeow_name=new_pokemeow_name,
+            new_channel=new_channel,
+            new_clan_bank_donations=new_clan_bank_donations,
+            new_clan_treasury_donations=new_clan_treasury_donations,
+        )
+
+    update_member.extras = {"category": "Staff"}
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(StaffGroup(bot))

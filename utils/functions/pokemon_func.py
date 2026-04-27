@@ -183,9 +183,15 @@ def get_embed_color_by_rarity(pokemon_name: str) -> int:
 
 
 def format_price_w_coin(n: int) -> str:
-    """Format PokeCoin price with commas."""
-    pokecoin = Emojis.pokecoin
-    return f"{pokecoin} {n:,}"
+    """Format a number with commas and add ' PokéCoins' suffix. If None, return 'None'."""
+    if number is None:
+        return "None"
+    # Ensure number is always an integer for formatting
+    try:
+        number = int(round(float(number)))
+    except (ValueError, TypeError):
+        return str(number)
+    return f"{Emojis.pokecoin} {number:,}"
 
 
 # ✨───────────────────────────────────────────────

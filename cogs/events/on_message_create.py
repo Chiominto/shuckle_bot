@@ -6,7 +6,7 @@ from utils.listener_func.ee_spawn_listener import (
     extract_boss_from_wb_command_embed,
     extract_boss_from_wb_spawn_command,
 )
-from constants.celestial_constants import CC_SERVER_ID, POKEMEOW_APPLICATION_ID, CC_BUMP_CHANNEL_ID
+from constants.celestial_constants import CC_SERVER_ID, POKEMEOW_APPLICATION_ID, CC_BUMP_CHANNEL_ID, CELESTIAL_TEXT_CHANNELS
 from utils.listener_func.icon_unlock_listener import icon_unlock_listener
 from utils.listener_func.wb_rs import handle_wb_rewards
 from utils.logs.pretty_log import pretty_log
@@ -15,6 +15,7 @@ from utils.listener_func.shiny_bonus_listener import (
     read_shiny_bonus_timestamp_from_cc_channel,
 )
 from utils.listener_func.code_use_listener import send_code_claim_to_rs
+from utils.listener_func.clan_invite_listener import clan_invite_listener
 triggers = {
     "icon_unlock": "as your icon with `/battle set-icon",
     "global_bonus": "Global bonuses",
@@ -23,7 +24,8 @@ triggers = {
     "ee_vote_checker": "there is no active world boss",
     "code_use": "<:checkedbox:752302633141665812> you used a code to claim a :gift:",
 }
-
+from utils.listener_func.donation_listener import give_command_listener, clan_donate_listener
+CLAN_BANK_USER_NAMES = ["burgersbank"]
 CC_SHINY_BONUS_CHANNEL_ID = 1457171231445876746
 # 🟣────────────────────────────────────────────
 #         🐢 Message Create Listener Cog
@@ -45,7 +47,7 @@ class MessageCreateListener(commands.Cog):
         if not guild:
             return  # Skip DMs
         # ————————————————————————————————
-        # 🩵 CC Bump Reminder Listener
+        # 🐢 CC Bump Reminder Listener
         # ————————————————————————————————
         if guild.id == CC_SERVER_ID:
             if message.channel.id == CC_BUMP_CHANNEL_ID:
@@ -93,7 +95,20 @@ class MessageCreateListener(commands.Cog):
             and not message.webhook_id
         ):
             return
-
+        # ————————————————————————————————
+        # 🐢 Clan Invite Handler
+        # ————————————————————————————————
+        if (
+            ":tada: Welcome," in message.content
+            and "You have successfully joined" in message.content
+            and "Celestial" in message.content
+        ):
+            pretty_log(
+                message=f"Detected clan invite message edit for member '{message.author.display_name}'.",
+                tag="info",
+                label="Clan Invite Command",
+            )
+            await clan_invite_listener(self.bot, message)
         # ————————————————————————————————
         # 🐢 Icon Unlock Handler
         # ————————————————————————————————
@@ -190,6 +205,37 @@ class MessageCreateListener(commands.Cog):
                     f"Failed processing code claim from message ID {getattr(message, 'id', 'unknown')}: {e}",
 
                 )
+
+        # ————————————————————————————————
+        # 🐢 Clan Donations
+        # ————————————————————————————————
+        if (
+            content
+                and "You successfully donated" in content
+                and "Celestial" in content
+            ):
+                pretty_log(
+                    "info",
+                    f"Detected clan donation message: {content}",
+                    label="DONATION_LISTENER",
+                )
+                await clan_donate_listener(self.bot, message)
+        if (
+            message.channel.id == CELESTIAL_TEXT_CHANNELS.donations
+        ):
+            # Clan Bank Donation
+            if (
+                content
+                and "gave" in content
+                and "PokeCoins" in content
+                and any(name in content for name in CLAN_BANK_USER_NAMES)
+            ):
+                pretty_log(
+                    "info",
+                    f"Detected clan bank donation message: {content}",
+                    label="DONATION_LISTENER",
+                )
+                await give_command_listener(self.bot, message)
 # 🟣────────────────────────────────────────────
 #         🐢 Setup Function
 # 🟣────────────────────────────────────────────

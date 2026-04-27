@@ -31,6 +31,7 @@ class Emojis:
 class Thumbnails:
     BATTLE_TOWER = "https://media.discordapp.net/attachments/1394913073520967680/1420593124379459605/image.png?ex=68d5f5f2&is=68d4a472&hm=2848b1f5b21259c320e3a46fc83368c251b18f7b5b7e3cc5e271581bd583f2a5&=&format=webp&quality=lossless&width=576&height=576"
     command = "https://media.discordapp.net/attachments/1393740397905313912/1492443708900249650/image.png?ex=69db5a04&is=69da0884&hm=ac848a967c1eb849cb32221a21451f82f828ba66f9f771cd285e9bc0b106135b&=&format=webp&quality=lossless&width=480&height=480"
-
+    bank = "https://cdn.discordapp.com/attachments/1493871255475191888/1498246374779650088/image.png?ex=69f0762b&is=69ef24ab&hm=e4483b598326ef7463cbd4e87409bdfadb8969fc68af99fd55fcc547bbbf5a66"
+    treasury = "https://cdn.discordapp.com/attachments/1493871255475191888/1498246688421183529/image.png?ex=69f07676&is=69ef24f6&hm=8df3c91b46b9bb972e9625f0bd2b4ae8ce3ab8266c35ed805707cf6ff592b6f4"
 class Dividers:
     command = "https://media.discordapp.net/attachments/1393740397905313912/1492449170341105744/image.png?ex=69db5f1a&is=69da0d9a&hm=2923f9a6dbf6e8756c7c705a686a105cf5c7590d4a6ad952cac21ea050ab0027&=&format=webp&quality=lossless&width=1465&height=94"
