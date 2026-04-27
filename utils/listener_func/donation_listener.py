@@ -165,6 +165,38 @@ async def process_donation(
     clan_treasury_donations = donation_record["clan_treasury_donation"] if donation_record else 0
     clan_bank_donations = donation_record["clan_bank_donation"] if donation_record else 0
 
+    # Get roles
+    not_donated_role = member.guild.get_role(CELESTIAL_ROLES.coin_saver)
+    donated_role = member.guild.get_role(CELESTIAL_ROLES.tip_jar_titan)
+
+    # Update roles
+    if not_donated_role in member.roles:
+        try:
+            await member.remove_roles(not_donated_role, reason="Made a donation")
+            pretty_log(
+                "info",
+                f"Removed role {not_donated_role.name} from member {member.id} for making a donation.",
+            )
+        except Exception as e:
+            pretty_log(
+                "error",
+                f"Failed to remove role {not_donated_role.name} from member {member.id}: {e}",
+                include_trace=True,
+            )
+    if donated_role not in member.roles:
+        try:
+            await member.add_roles(donated_role, reason="Made a donation")
+            pretty_log(
+                "info",
+                f"Added role {donated_role.name} to member {member.id} for making a donation.",
+            )
+        except Exception as e:
+            pretty_log(
+                "error",
+                f"Failed to add role {donated_role.name} to member {member.id}: {e}",
+                include_trace=True,
+            )
+            
 
     # Log the donation
     if context == "clan bank":
