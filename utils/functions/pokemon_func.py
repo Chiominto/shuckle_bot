@@ -1,7 +1,6 @@
 from constants.aesthetics import *
 from constants.paldea_galar_dict import dex, rarity_meta
 from constants.pokemons import *
-
 from utils.logs.debug_log import debug_enabled, debug_log, enable_debug
 from utils.logs.pretty_log import pretty_log
 
@@ -182,8 +181,9 @@ def get_embed_color_by_rarity(pokemon_name: str) -> int:
     return rarity_meta.get(rarity, {}).get("color", 0xFFFFFF)
 
 
-def format_price_w_coin(n: int) -> str:
-    """Format a number with commas and add ' PokéCoins' suffix. If None, return 'None'."""
+def format_price_w_coin(n: int | float | str | None) -> str:
+    """Format a value with commas and add coin emoji prefix; if invalid, return raw string."""
+    number = n
     if number is None:
         return "None"
     # Ensure number is always an integer for formatting

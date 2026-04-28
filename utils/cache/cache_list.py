@@ -19,7 +19,7 @@ celestial_members_cache: dict[int, dict] = {}
 # Structure:
 # user_id -> {
 #   "user_name": str,
-#   "pokemon_name": str,
+#   "pokemeow_name": str,
 #   "channel_id": int
 #   "actual_perks": str
 #   "clan_bank_donation": int
