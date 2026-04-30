@@ -13,7 +13,7 @@ from utils.functions.parsers import parse_compact_number
 from utils.functions.pretty_defer import pretty_defer
 from utils.functions.webhook_func import send_server_log, send_webhook
 from utils.logs.pretty_log import pretty_log
-
+from utils.functions.pokemon_func import format_price_w_coin
 
 async def update_member_func(
     bot: commands.Bot,
@@ -53,6 +53,7 @@ async def update_member_func(
                 "Invalid format for Clan Bank Donations. Please enter a valid number (e.g., 1.5k, 2M)."
             )
             return
+        formatted_clan_bank_donations = format_price_w_coin(new_clan_bank_donations)
     if new_clan_treasury_donations is not None:
         new_clan_treasury_donations = parse_compact_number(new_clan_treasury_donations)
         if new_clan_treasury_donations is None:
@@ -60,6 +61,7 @@ async def update_member_func(
                 "Invalid format for Clan Treasury Donations. Please enter a valid number (e.g., 1.5k, 2M)."
             )
             return
+        formatted_clan_treasury_donations = format_price_w_coin(new_clan_treasury_donations)
 
     # Check if member is in database
     member_info = await fetch_celestial_member(bot, member.id)
@@ -100,12 +102,12 @@ async def update_member_func(
     )
     new_channel_str = f"**Channel:** {new_channel.mention}\n" if new_channel else ""
     new_clan_bank_donations_str = (
-        f"**Clan Bank Donations:** {new_clan_bank_donations}\n"
+        f"**Clan Bank Donations:** {formatted_clan_bank_donations}\n"
         if new_clan_bank_donations is not None
         else ""
     )
     new_clan_treasury_donations_str = (
-        f"**Clan Treasury Donations:** {new_clan_treasury_donations}\n"
+        f"**Clan Treasury Donations:** {formatted_clan_treasury_donations}\n"
         if new_clan_treasury_donations is not None
         else ""
     )
