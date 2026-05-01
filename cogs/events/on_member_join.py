@@ -68,7 +68,7 @@ class OnMemberJoinCog(commands.Cog):
             icon_url=guild.icon.url if guild.icon else None,
         )
         if log_channel:
-            await send_webhook(bot=self.bot, channel=log_channel, embed=embed)
+            await send_webhook(bot=self.bot, channel=log_channel, embed=log_embed)
         else:
             pretty_log(
                 tag="warn",
