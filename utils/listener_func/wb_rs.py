@@ -293,7 +293,7 @@ async def handle_wb_rewards(
 
         if member:
             new_embed.set_author(
-                name=f"From {challenge_name}", icon_url=member.display_avatar.url
+                name=member.display_name, icon_url=member.display_avatar.url
             )
 
         # 🖼️ Thumbnail / Image logic
