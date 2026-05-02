@@ -118,6 +118,7 @@ async def clan_invite_listener(bot: discord.Client, message: discord.Message):
     # Upsert member to DB
     try:
         await upsert_celestial_member(
+            bot=bot,
             user_id=member.id,
             pokemeow_name=pokemeow_name,
             user_name=member.name,
@@ -161,7 +162,7 @@ async def clan_invite_listener(bot: discord.Client, message: discord.Message):
             if adventurer_role in member.roles:
                 await member.remove_roles(adventurer_role)
                 debug_log(f"Removed adventurer role from {member.name}")
-                
+
     except Exception as e:
         debug_log(f"Error adding roles to {member.name}: {e}")
         pretty_log(
