@@ -150,7 +150,7 @@ async def role_members_func(
         # 🌿 Get members with this role
         members = [m for m in interaction.guild.members if role in m.roles]
 
-        role_icon_url = role.icon.url
+        role_icon_url = role.icon.url if role.icon else None
         if role_icon_url:
             thumbnail_url = role_icon_url
 

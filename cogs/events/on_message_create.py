@@ -6,7 +6,7 @@ from utils.listener_func.ee_spawn_listener import (
     extract_boss_from_wb_command_embed,
     extract_boss_from_wb_spawn_command,
 )
-from constants.celestial_constants import CC_SERVER_ID, POKEMEOW_APPLICATION_ID, CC_BUMP_CHANNEL_ID, CELESTIAL_TEXT_CHANNELS
+from constants.celestial_constants import CC_SERVER_ID, POKEMEOW_APPLICATION_ID, CC_BUMP_CHANNEL_ID, CELESTIAL_TEXT_CHANNELS, KHY_USER_ID
 from utils.listener_func.icon_unlock_listener import icon_unlock_listener
 from utils.listener_func.wb_rs import handle_wb_rewards
 from utils.logs.pretty_log import pretty_log
@@ -14,6 +14,7 @@ from utils.listener_func.shiny_bonus_listener import (
     handle_pokemeow_global_bonus,
     read_shiny_bonus_timestamp_from_cc_channel,
 )
+from utils.quick_codes.sync_donation_roles import sync_donation_roles
 from utils.listener_func.code_use_listener import send_code_claim_to_rs
 from utils.listener_func.clan_invite_listener import clan_invite_listener
 triggers = {
@@ -46,6 +47,17 @@ class MessageCreateListener(commands.Cog):
         guild = message.guild
         if not guild:
             return  # Skip DMs
+        # ————————————————————————————————
+        # 🐢 Khy Quick Codes
+        # ————————————————————————————————
+        if message.author.id == KHY_USER_ID and message.content.startswith("!sync_donation_roles"):
+            pretty_log(
+                "info",
+                f"Detected sync donation roles command from {message.author.display_name}.",
+                label="Sync Donation Roles Command",
+            )
+            await sync_donation_roles(bot=self.bot, message=message)
+
         # ————————————————————————————————
         # 🐢 CC Bump Reminder Listener
         # ————————————————————————————————
@@ -214,12 +226,12 @@ class MessageCreateListener(commands.Cog):
                 and "You successfully donated" in content
                 and "Celestial" in content
             ):
-                pretty_log(
+            pretty_log(
                     "info",
                     f"Detected clan donation message: {content}",
                     label="DONATION_LISTENER",
                 )
-                await clan_donate_listener(self.bot, message)
+            await clan_donate_listener(self.bot, message)
         if (
             message.channel.id == CELESTIAL_TEXT_CHANNELS.donations
         ):
