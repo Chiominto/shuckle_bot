@@ -35,8 +35,8 @@ async def sync_donation_roles(
                     "info",
                     f"Upserted temp role {not_donated_role.name} for user {member.name} ({member.id})"
                 )
-        await processing_msg.edit(content=f"{Emojis.success} Successfully synced donation roles.")
-        
+        await processing_msg.edit(content=f"{Emojis.check} Successfully synced donation roles.")
+
     except Exception as e:
         pretty_log("error", f"Error syncing donation roles: {e}")
         await processing_msg.edit(content=f"{Emojis.error} Error syncing donation roles.")
