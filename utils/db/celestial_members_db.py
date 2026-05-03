@@ -154,7 +154,30 @@ async def fetch_all_celestial_members(bot: discord.Client):
         )
         return [], str(e)
 
-
+async def fetch_all_celestial_member_ids(bot: discord.Client):
+    """Fetch all celestial member IDs from the database."""
+    try:
+        async with bot.pg_pool.acquire() as conn:
+            rows = await conn.fetch(
+                """
+                SELECT user_id
+                FROM celestial_members
+                """
+            )
+            member_ids = [row["user_id"] for row in rows]
+            pretty_log(
+                message=f"✅ Fetched {len(member_ids)} celestial member IDs from the database.",
+                tag="db",
+            )
+            return member_ids, None
+    except Exception as e:
+        pretty_log(
+            message=f"❌ Failed to fetch celestial member IDs: {e}",
+            tag="error",
+            include_trace=True,
+        )
+        return [], str(e)
+    
 async def fetch_celestial_member(bot: discord.Client, user_id: int):
     """Fetch a single celestial member by user ID."""
     try:
