@@ -192,6 +192,29 @@ class StaffGroup(commands.Cog):
 
     update_member.extras = {"category": "Staff"}
 
+    # 🤍───────────────────────────────────────
+    # 📌 /staff clan-members
+    # 🤍───────────────────────────────────────
+    @staff.command(
+        name="clan-members",
+        description="List all members of the Celestial Clan.",
+    )
+    @staff_only()
+    async def clan_members(
+        self,
+        interaction: discord.Interaction,
+    ):
+        slash_cmd_name = "staff clan-members"
+
+        # Call the centralized clan members logic
+        await run_command_safe(
+            bot=self.bot,
+            interaction=interaction,
+            slash_cmd_name=slash_cmd_name,
+            command_func=clan_members_func,  # your main logic lives here
+        )
+    clan_members.extras = {"category": "Staff"}
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(StaffGroup(bot))

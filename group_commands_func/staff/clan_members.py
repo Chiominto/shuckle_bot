@@ -119,7 +119,7 @@ async def clan_members_func(
     bot: commands.Bot,
     interaction: discord.Interaction,
 ):
-    """List all members of the VNA Clan."""
+    """List all members of the Celestial Clan."""
 
     # Check if user is a staff member
     user = interaction.user
@@ -130,11 +130,11 @@ async def clan_members_func(
         ephemeral=False,
     )
 
-    # Fetch all VNA members from the database
+    # Fetch all Clan members from the database
     try:
         members = await fetch_all_celestial_members(bot)
         if not members:
-            await loader.error(content="No VNA Clan members found in the database.")
+            await loader.error(content="No Celestial Clan members found in the database.")
             return
 
         # Sort members by clan_joined_date (oldest first, unknowns last)
@@ -154,11 +154,11 @@ async def clan_members_func(
 
     except Exception as e:
         pretty_log(
-            message=f"Failed to fetch VNA members from database: {e}",
+            message=f"Failed to fetch Celestial members from database: {e}",
             tag="error",
             label="Clan Members Fetch Error",
         )
         await loader.error(
-            content="Failed to fetch VNA Clan members from the database."
+            content="Failed to fetch Celestial Clan members from the database."
         )
         return
