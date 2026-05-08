@@ -1,22 +1,30 @@
 import discord
 from discord.ext import commands
+
+from constants.celestial_constants import (
+    CC_BUMP_CHANNEL_ID,
+    CC_SERVER_ID,
+    CELESTIAL_TEXT_CHANNELS,
+    KHY_USER_ID,
+    POKEMEOW_APPLICATION_ID,
+)
+from utils.listener_func.clan_invite_listener import clan_invite_listener
+from utils.listener_func.code_use_listener import send_code_claim_to_rs
 from utils.listener_func.ee_spawn_listener import (
     check_cc_bump_reminder,
     check_ee_near_spawn_alert,
     extract_boss_from_wb_command_embed,
     extract_boss_from_wb_spawn_command,
 )
-from constants.celestial_constants import CC_SERVER_ID, POKEMEOW_APPLICATION_ID, CC_BUMP_CHANNEL_ID, CELESTIAL_TEXT_CHANNELS, KHY_USER_ID
 from utils.listener_func.icon_unlock_listener import icon_unlock_listener
-from utils.listener_func.wb_rs import handle_wb_rewards
-from utils.logs.pretty_log import pretty_log
 from utils.listener_func.shiny_bonus_listener import (
     handle_pokemeow_global_bonus,
     read_shiny_bonus_timestamp_from_cc_channel,
 )
+from utils.listener_func.wb_rs import handle_wb_rewards
+from utils.logs.pretty_log import pretty_log
 from utils.quick_codes.sync_donation_roles import sync_donation_roles
-from utils.listener_func.code_use_listener import send_code_claim_to_rs
-from utils.listener_func.clan_invite_listener import clan_invite_listener
+
 CC_MH_REPORT_CHANNEL_ID = 1502156762466357338
 triggers = {
     "icon_unlock": "as your icon with `/battle set-icon",
@@ -26,10 +34,17 @@ triggers = {
     "ee_vote_checker": "there is no active world boss",
     "code_use": "<:checkedbox:752302633141665812> you used a code to claim a :gift:",
 }
-from utils.listener_func.donation_listener import give_command_listener, clan_donate_listener
+from utils.listener_func.donation_listener import (
+    clan_donate_listener,
+    give_command_listener,
+)
+from utils.listener_func.market_snipe_filter import should_delete_market_message
 from utils.listener_func.ms_reports import relay_meowsummit_reports
+
 CLAN_BANK_USER_NAMES = ["burgersbank"]
 CC_SHINY_BONUS_CHANNEL_ID = 1457171231445876746
+
+
 # 🟣────────────────────────────────────────────
 #         🐢 Message Create Listener Cog
 # 🟣────────────────────────────────────────────
@@ -48,11 +63,24 @@ class MessageCreateListener(commands.Cog):
         # ————————————————————————————————
         guild = message.guild
         if not guild:
-            return  # Skip DMs
+            return  # Skip
+
+        # ————————————————————————————————
+        # 🐢 Market Snipe Filter
+        # ————————————————————————————————
+        if (
+            message.channel.id == CELESTIAL_TEXT_CHANNELS.market_snipe
+            and not message.author.bot
+            and not message.webhook_id
+        ):
+            await should_delete_market_message(message)
+
         # ————————————————————————————————
         # 🐢 Khy Quick Codes
         # ————————————————————————————————
-        if message.author.id == KHY_USER_ID and message.content.startswith("!sync_donation_roles"):
+        if message.author.id == KHY_USER_ID and message.content.startswith(
+            "!sync_donation_roles"
+        ):
             pretty_log(
                 "info",
                 f"Detected sync donation roles command from {message.author.display_name}.",
@@ -168,9 +196,7 @@ class MessageCreateListener(commands.Cog):
         # 🐢 EE Near Spawn Alert Checker
         # ————————————————————————————————
         if message.embeds:
-            embed_title = (
-                message.embeds[0].title if message.embeds[0].title else ""
-            )
+            embed_title = message.embeds[0].title if message.embeds[0].title else ""
             if triggers["ee_vote_checker"] in embed_title.lower():
                 pretty_log(
                     "info",
@@ -183,18 +209,14 @@ class MessageCreateListener(commands.Cog):
         # 🐢 World Boss Command Embed Listener
         # ————————————————————————————————
         if message.embeds:
-            embed_title = (
-                message.embeds[0].title if message.embeds[0].title else ""
-            )
+            embed_title = message.embeds[0].title if message.embeds[0].title else ""
             if triggers["wb_command"] in embed_title.lower():
                 pretty_log(
                     "info",
                     f"Detected world boss command embed from PokéMeow bot: Message ID {message.id}",
                     label="World Boss Command Embed Listener",
                 )
-                await extract_boss_from_wb_command_embed(
-                    bot=self.bot, message=message
-                )
+                await extract_boss_from_wb_command_embed(bot=self.bot, message=message)
         # ————————————————————————————————
         # 🐢 World Boss Spawn Listener
         # ————————————————————————————————
@@ -205,9 +227,7 @@ class MessageCreateListener(commands.Cog):
                     f"Detected world boss spawn message from PokéMeow bot: Message ID {message.id}",
                     label="World Boss Spawn Listener",
                 )
-                await extract_boss_from_wb_spawn_command(
-                    bot=self.bot, message=message
-                )
+                await extract_boss_from_wb_spawn_command(bot=self.bot, message=message)
 
         # ————————————————————————————————
         # 🐢 Code Claim Listener
@@ -218,32 +238,24 @@ class MessageCreateListener(commands.Cog):
                 pretty_log(
                     "ready",
                     f"Successfully processed code claim from message ID {getattr(message, 'id', 'unknown')}",
-
                 )
             except Exception as e:
                 pretty_log(
                     "critical",
                     f"Failed processing code claim from message ID {getattr(message, 'id', 'unknown')}: {e}",
-
                 )
 
         # ————————————————————————————————
         # 🐢 Clan Donations
         # ————————————————————————————————
-        if (
-            content
-                and "You successfully donated" in content
-                and "Celestial" in content
-            ):
+        if content and "You successfully donated" in content and "Celestial" in content:
             pretty_log(
-                    "info",
-                    f"Detected clan donation message: {content}",
-                    label="DONATION_LISTENER",
-                )
+                "info",
+                f"Detected clan donation message: {content}",
+                label="DONATION_LISTENER",
+            )
             await clan_donate_listener(self.bot, message)
-        if (
-            message.channel.id == CELESTIAL_TEXT_CHANNELS.donations
-        ):
+        if message.channel.id == CELESTIAL_TEXT_CHANNELS.donations:
             # Clan Bank Donation
             if (
                 content
@@ -257,6 +269,8 @@ class MessageCreateListener(commands.Cog):
                     label="DONATION_LISTENER",
                 )
                 await give_command_listener(self.bot, message)
+
+
 # 🟣────────────────────────────────────────────
 #         🐢 Setup Function
 # 🟣────────────────────────────────────────────
