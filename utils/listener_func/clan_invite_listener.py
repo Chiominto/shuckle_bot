@@ -146,7 +146,7 @@ async def clan_invite_listener(bot: discord.Client, message: discord.Message):
     # Add roles to member
     clan_member_role = guild.get_role(CELESTIAL_ROLES.celestialnova_)
     coin_saver_role = guild.get_role(CELESTIAL_ROLES.coin_saver)
-    drifting_star_role = guild.get_role(CELESTIAL_ROLES.driftingstar)
+    npc_role = guild.get_role(CELESTIAL_ROLES.npc)
     adventurer_role = guild.get_role(CELESTIAL_ROLES.adventurer)
     try:
         debug_log(
@@ -154,10 +154,10 @@ async def clan_invite_listener(bot: discord.Client, message: discord.Message):
         )
         await member.add_roles(clan_member_role, coin_saver_role)
         debug_log(f"Added roles to {member.name} successfully.")
-        if drifting_star_role and adventurer_role:
+        if npc_role and adventurer_role:
             # Remove both roles from member if they have them cuz its guest roles
-            if drifting_star_role in member.roles:
-                await member.remove_roles(drifting_star_role)
+            if npc_role in member.roles:
+                await member.remove_roles(npc_role)
                 debug_log(f"Removed drifting star role from {member.name}")
             if adventurer_role in member.roles:
                 await member.remove_roles(adventurer_role)
@@ -219,9 +219,9 @@ Please head over to your own personal channel ([{new_member_channel.name}]({new_
         f"**Member:** {member.mention}\n"
         f"**PokéMeow Name:** {pokemeow_name}\n"
         f"**Channel:** {new_member_channel.mention}\n"
-        f"**Account Created:** {member.created_at.strftime('%Y-%m-%d %H:%M:%S')}\n"
-        f"**Joined Server:** {member.joined_at.strftime('%Y-%m-%d %H:%M:%S')}\n"
-        f"**Joined Clan:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+        f"**Account Created:** <t:{int(member.created_at.timestamp())}:f>\n"
+        f"**Joined Server:** <t:{int(member.joined_at.timestamp())}:f>\n"
+        f"**Joined Clan:** <t:{int(datetime.now().timestamp())}:f>\n"
     )
     log_embed = discord.Embed(
         title="New Clan Member Added",
