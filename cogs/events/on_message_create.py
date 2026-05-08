@@ -17,6 +17,7 @@ from utils.listener_func.shiny_bonus_listener import (
 from utils.quick_codes.sync_donation_roles import sync_donation_roles
 from utils.listener_func.code_use_listener import send_code_claim_to_rs
 from utils.listener_func.clan_invite_listener import clan_invite_listener
+CC_MH_REPORT_CHANNEL_ID = 1502156762466357338
 triggers = {
     "icon_unlock": "as your icon with `/battle set-icon",
     "global_bonus": "Global bonuses",
@@ -26,6 +27,7 @@ triggers = {
     "code_use": "<:checkedbox:752302633141665812> you used a code to claim a :gift:",
 }
 from utils.listener_func.donation_listener import give_command_listener, clan_donate_listener
+from utils.listener_func.ms_reports import relay_meowsummit_reports
 CLAN_BANK_USER_NAMES = ["burgersbank"]
 CC_SHINY_BONUS_CHANNEL_ID = 1457171231445876746
 # 🟣────────────────────────────────────────────
@@ -78,6 +80,13 @@ class MessageCreateListener(commands.Cog):
                 await read_shiny_bonus_timestamp_from_cc_channel(
                     bot=self.bot, message=message
                 )
+            if message.channel.id == CC_MH_REPORT_CHANNEL_ID:
+                pretty_log(
+                    "info",
+                    f"Detected message in MeowSummit reports channel: Message ID {message.id}",
+                    label="MeowSummit Report Relay",
+                )
+                await relay_meowsummit_reports(bot=self.bot, message=message)
 
         # ————————————————————————————————
         # 🐢 Message Variables
@@ -203,7 +212,7 @@ class MessageCreateListener(commands.Cog):
         # ————————————————————————————————
         # 🐢 Code Claim Listener
         # ————————————————————————————————
-        if triggers["code_use"].lower() in content:
+        if triggers["code_use"].lower() in content.lower():
             try:
                 await send_code_claim_to_rs(bot=self.bot, message=message)
                 pretty_log(

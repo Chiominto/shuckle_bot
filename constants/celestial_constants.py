@@ -8,12 +8,14 @@ CELESTIAL_SERVER_ID = 1490116594884411402
 JJOKNYANG_USER_ID = 1084476913545908355
 CC_BUMP_CHANNEL_ID = 1396329392208089180
 CELESTIAL_BANK_USER_ID = 1491079044769513544
-
+CC_MH_REPORT_CHANNEL_ID = 1502156762466357338
 
 # 💦☁────────────────────────────────────────────💦☁
 #       CELESTIAL_TEXT_CHANNELS
 # 💦☁────────────────────────────────────────────💦☁
 class CELESTIAL_TEXT_CHANNELS:
+    clan_guide = 1493874658347450441
+    summit_reports = 1502062266676285522
 
     # 🌊💙🤍───────────── Admin ─────────────💙🤍🌊
     roles_breakdown = 1492921526591291563
@@ -109,6 +111,8 @@ class CELESTIAL_CATEGORIES:
 #       CELESTIAL_ROLES
 # 💦☁────────────────────────────────────────────💦☁
 class CELESTIAL_ROLES:
+
+    personal_role_divider = 1500689908715622512
     giveaways = 1493045397575438470
     _unknown = 1490876248577020086
     pokémeow = 1490117261824884991

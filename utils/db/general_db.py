@@ -10,6 +10,7 @@ TABLE_NAMES = [
     "personal_roles",
     "user_alerts",
     "watering_can",
+    "custom_roles",
 ]
 
 

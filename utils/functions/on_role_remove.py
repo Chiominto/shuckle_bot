@@ -7,6 +7,7 @@ from constants.celestial_constants import CELESTIAL_ROLES
 from utils.db.temp_roles_db import delete_temp_role
 from utils.functions.webhook_func import send_server_log
 from utils.logs.pretty_log import pretty_log
+from utils.functions.server_booster_handler import handle_server_booster_role_remove
 
 TEMP_ROLE_IDS = [
     CELESTIAL_ROLES.coin_saver,
@@ -37,7 +38,12 @@ async def handle_role_remove(
         pretty_log(
             "info", f"Deleted temp role {role_name} for user {user_name} ({user_id})"
         )
-
+    # ————————————————————————————————
+    # 🩵 Server Booster Role Remove
+    # ————————————————————————————————
+    if role_id == CELESTIAL_ROLES.server_booster:
+        await handle_server_booster_role_remove(bot, member)
+        
     # ————————————————————————————————
     # 🩵 Role Removal Logging
     # ————————————————————————————————

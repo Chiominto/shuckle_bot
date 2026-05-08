@@ -8,7 +8,7 @@ from constants.celestial_constants import (
     CELESTIAL_SERVER_ID,
     DEFAULT_EMBED_COLOR,
 )
-from utils.db.personal_roles_db import fetch_personal_role_id
+from utils.db.custom_roles_db_func import fetch_custom_role_id_by_user_id
 from utils.functions.pokemon_func import format_price_w_coin
 from utils.functions.pretty_defer import pretty_defer
 from utils.logs.pretty_log import pretty_log
@@ -45,7 +45,9 @@ async def whois_func(
         await loader.error("Member not found in this server.")
         return
 
-    personal_role_id, error_msg = await fetch_personal_role_id(bot, user_id=user.id)
+    personal_role_id, error_msg = await fetch_custom_role_id_by_user_id(
+        bot, user_id=user.id
+    )
     server_joined_unix = int(user.joined_at.timestamp()) if user.joined_at else None
     server_joined_ts = (
         f"<t:{server_joined_unix}:f>" if server_joined_unix else "Unknown"
@@ -127,4 +129,3 @@ async def whois_func(
         embed.set_thumbnail(url=user.display_avatar.url)
         embed.set_author(name=user.display_name, icon_url=user.display_avatar.url)
         await loader.success(embed=embed, content="")
-
