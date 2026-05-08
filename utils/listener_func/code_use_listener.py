@@ -3,20 +3,19 @@ from urllib.parse import urlparse
 
 import discord
 
+from constants.aesthetics import Emojis
 from constants.celestial_constants import (
-    CELESTIAL_TEXT_CHANNELS,
     CELESTIAL_ROLES,
     CELESTIAL_SERVER_ID,
+    CELESTIAL_TEXT_CHANNELS,
     DEFAULT_EMBED_COLOR,
     KHY_USER_ID,
 )
-from constants.aesthetics import Emojis
 from constants.paldea_galar_dict import rarity_meta
-
-from utils.functions.pokemeow_reply import get_pokemeow_reply_member
-from utils.logs.pretty_log import pretty_log
 from utils.functions.design_embed import design_embed, format_bulletin_desc
+from utils.functions.pokemeow_reply import get_pokemeow_reply_member
 from utils.functions.webhook_func import send_webhook
+from utils.logs.pretty_log import pretty_log
 
 
 def is_valid_url(url: str) -> bool:
@@ -39,7 +38,6 @@ def extract_prize(text):
     return None
 
 
-
 # 🎉────────────────────────────────────────────
 #   💠 Pokémon Code Claim Handler (Patched)
 # 🎉────────────────────────────────────────────
@@ -56,7 +54,6 @@ async def send_code_claim_to_rs(
             pretty_log(
                 "critical",
                 f"Failed to fetch member from message ID {message.id}",
-
             )
             return
 
@@ -67,7 +64,6 @@ async def send_code_claim_to_rs(
             pretty_log(
                 "critical",
                 f"Acheievements channel not found in guild {guild.name} ({guild.id})",
-
             )
             return
 
@@ -79,7 +75,6 @@ async def send_code_claim_to_rs(
             pretty_log(
                 "critical",
                 f"Failed to extract Pokémon name from message ID {message.id}",
-
             )
             return
 
@@ -110,7 +105,6 @@ async def send_code_claim_to_rs(
                 flags=re.IGNORECASE,
             ).strip()
 
-
         # ──────────────────────────────────────────────
         #   ✅ Build & send embed
         # ──────────────────────────────────────────────
@@ -124,7 +118,7 @@ async def send_code_claim_to_rs(
             user=member,
             embed=embed,
             pokemon_name=pokemon_name_lower,
-            override_color=color,
+            color=color,
             footer_text=footer_text,
         )
         embed.color = color
@@ -137,12 +131,10 @@ async def send_code_claim_to_rs(
         pretty_log(
             "ready",
             f"Successfully posted Pokémon code claim for {display_name} (Message ID {message.id})",
-
         )
 
     except Exception as e:
         pretty_log(
             "critical",
             f"Unexpected error in send_code_claim_to_rs (Message ID {getattr(message, 'id', 'unknown')}): {e}",
-
         )
