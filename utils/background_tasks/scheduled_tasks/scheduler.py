@@ -8,11 +8,14 @@ import calendar
 import zoneinfo
 from datetime import datetime
 from zoneinfo import ZoneInfo
+
 from utils.logs.pretty_log import pretty_log
-from .schedule_manager import SchedulerManager
+
 from .battle_tower_reminder import send_battle_tower_closing_reminder
-from .os_lotto_reminder import send_lotto_reminder
 from .donation_role_reset import reset_donation_roles
+from .os_lotto_reminder import send_lotto_reminder
+from .schedule_manager import SchedulerManager
+
 # Timezones
 MANILA = zoneinfo.ZoneInfo("Asia/Manila")
 NYC = zoneinfo.ZoneInfo("America/New_York")  # auto-handles EST/EDT
@@ -67,8 +70,7 @@ async def setup_schedulers(bot):
             args=[bot],
         )
         readable_next_run = format_next_run_manila(os_lotto_reminder.next_run_time)
-        schedules.append(f"🎲 OS Lotto Reminder scheduled for {readable_next_run}"
-        )
+        schedules.append(f"🎲 OS Lotto Reminder scheduled for {readable_next_run}")
     except Exception as e:
         pretty_log("error", f"Failed to schedule OS Lotto Reminder: {e}")
 
@@ -88,29 +90,31 @@ async def setup_schedulers(bot):
             args=[bot],
         )
         readable_next_run = format_next_run_manila(battle_tower_reminder.next_run_time)
-        schedules.append(f"⚔️ Battle Tower Closing Reminder scheduled for {readable_next_run
-        }")
+        schedules.append(
+            f"⚔️ Battle Tower Closing Reminder scheduled for {readable_next_run
+        }"
+        )
     except Exception as e:
         pretty_log("error", f"Failed to schedule Battle Tower Closing Reminder: {e}")
 
-    # 🏰 Donation Role Reset Every Sunday 12 AM EST
+    # 🏰 Donation Role Reset 5 minutes before sunday 12 am EST
     try:
         donation_role_reset = scheduler_manager.add_cron_job(
             reset_donation_roles,
             name="donation_role_reset",
-            day_of_week="sun",
-            hour=0,
-            minute=0,
-            timezone=NYC,  # New York timezone for consistency with donation tracking
+            day_of_week="sat",
+            hour=23,
+            minute=55,
+            timezone=NYC,
             args=[bot],
         )
         readable_next_run = format_next_run_manila(donation_role_reset.next_run_time)
-        schedules.append(f"💰 Donation Role Reset scheduled for {readable_next_run}")
+        schedules.append(f"🏰 Donation Role Reset scheduled for {readable_next_run}")
     except Exception as e:
         pretty_log("error", f"Failed to schedule Donation Role Reset: {e}")
-        
 
     schedule_checklist(schedules)
+
 
 # 🟣────────────────────────────────────────────
 #         ⚡ Startup Checklist ⚡
