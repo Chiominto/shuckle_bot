@@ -50,18 +50,38 @@ async def reset_donation_roles(bot: discord.Client):
         return
     sent_message = None
     overwrite_bank_channel = clan_bank_channel.overwrites_for(celestial_nova_role)
-    overwrite_bank_channel.send_messages = False
-    await clan_bank_channel.set_permissions(
-        celestial_nova_role, overwrite=overwrite_bank_channel
-    )
-    msg_clan_bank_close = f"{Emojis.loading} Closing donation channel while we reset donated roles. Please wait..."
-    sent_message = await clan_bank_channel.send(msg_clan_bank_close)
+    original_send_messages = overwrite_bank_channel.send_messages
     try:
+        overwrite_bank_channel.send_messages = False
+        await clan_bank_channel.set_permissions(
+            celestial_nova_role, overwrite=overwrite_bank_channel
+        )
+        msg_clan_bank_close = f"{Emojis.loading} Closing donation channel while we reset donated roles. Please wait..."
+        sent_message = await clan_bank_channel.send(msg_clan_bank_close)
         celestial_members_ids, _ = await fetch_all_celestial_member_ids(bot)
         for member_id in celestial_members_ids:
             member = guild.get_member(member_id)
             if not member:
-                continue
+                try:
+                    member = await guild.fetch_member(member_id)
+                except discord.NotFound:
+                    pretty_log(
+                        "warning",
+                        f"Member not found in guild for ID {member_id}; skipping",
+                    )
+                    continue
+                except discord.Forbidden:
+                    pretty_log(
+                        "error",
+                        f"Missing permissions to fetch member {member_id}; skipping",
+                    )
+                    continue
+                except discord.HTTPException as e:
+                    pretty_log(
+                        "error",
+                        f"HTTP error fetching member {member_id}; skipping: {e}",
+                    )
+                    continue
             if donated_role in member.roles:
                 try:
                     await member.remove_roles(
@@ -92,16 +112,19 @@ async def reset_donation_roles(bot: discord.Client):
                     )
     finally:
         overwrite_bank = clan_bank_channel.overwrites_for(celestial_nova_role)
-        overwrite_bank.send_messages = True
-        await clan_bank_channel.set_permissions(
-            celestial_nova_role, overwrite=overwrite_bank
-        )
+        overwrite_bank.send_messages = original_send_messages
+        try:
+            await clan_bank_channel.set_permissions(
+                celestial_nova_role, overwrite=overwrite_bank
+            )
+        except Exception as e:
+            pretty_log("error", f"Error restoring donation channel permissions: {e}")
         if sent_message:
             try:
                 await sent_message.delete()
             except Exception as e:
                 pretty_log("warning", f"Error deleting status message: {e}")
-    content = f"<@&{CELESTIAL_ROLES.coin_saver}> , it's that time again drop your weekly <:PokeCoin:1255459577080840223> 100k coins and keep the stars in our system shining bright."
+    content = f"<@&{CELESTIAL_ROLES.coin_saver}>, it's that time again drop your weekly <:PokeCoin:1255459577080840223> 100k coins and keep the stars in our system shining bright."
     try:
         await clan_bank_channel.send(content)
         pretty_log("info", "Sent donation reminder message in clan bank channel")
