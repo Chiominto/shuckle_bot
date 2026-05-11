@@ -124,7 +124,7 @@ async def send_code_claim_to_rs(
         embed.color = color
         await send_webhook(
             bot=bot,
-            channel_id=achievement_channel.id,
+            channel=achievement_channel,
             embed=embed,
         )
 

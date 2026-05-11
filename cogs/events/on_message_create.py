@@ -1,3 +1,5 @@
+import re
+
 import discord
 from discord.ext import commands
 
@@ -8,6 +10,7 @@ from constants.celestial_constants import (
     KHY_USER_ID,
     POKEMEOW_APPLICATION_ID,
 )
+from utils.listener_func.battle_frontier_ach import handle_battle_frontier_achievement
 from utils.listener_func.clan_invite_listener import clan_invite_listener
 from utils.listener_func.code_use_listener import send_code_claim_to_rs
 from utils.listener_func.ee_spawn_listener import (
@@ -16,6 +19,7 @@ from utils.listener_func.ee_spawn_listener import (
     extract_boss_from_wb_command_embed,
     extract_boss_from_wb_spawn_command,
 )
+from utils.listener_func.golden_stone_listener import golden_stone_listener
 from utils.listener_func.icon_unlock_listener import icon_unlock_listener
 from utils.listener_func.shiny_bonus_listener import (
     handle_pokemeow_global_bonus,
@@ -33,16 +37,20 @@ triggers = {
     "wb_command": "a world boss has spawned! register now!",
     "ee_vote_checker": "there is no active world boss",
     "code_use": "<:checkedbox:752302633141665812> you used a code to claim a :gift:",
+    "golden_stone": "to claim your <:golden_",
+    "battle_frontier_ach": "🎖️ you may continue your",
 }
 from utils.listener_func.donation_listener import (
     clan_donate_listener,
     give_command_listener,
 )
 from utils.listener_func.market_snipe_filter import should_delete_market_message
+from utils.listener_func.message_listener_debug import handle_test_message
 from utils.listener_func.ms_reports import relay_meowsummit_reports
 
 CLAN_BANK_USER_NAMES = ["burgersbank"]
 CC_SHINY_BONUS_CHANNEL_ID = 1457171231445876746
+CODE_USE_PATTERN = re.compile(r"\byou used a code to claim\b", re.IGNORECASE)
 
 
 # 🟣────────────────────────────────────────────
@@ -87,7 +95,16 @@ class MessageCreateListener(commands.Cog):
                 label="Sync Donation Roles Command",
             )
             await sync_donation_roles(bot=self.bot, message=message)
-
+        if (
+            message.content
+            and message.content.lower().startswith("stest")
+            and message.author.id == KHY_USER_ID
+        ):
+            pretty_log(
+                "debug",
+                f"Received test command from {message.author}, invoking test handler",
+            )
+            await handle_test_message(self.bot, message)
         # ————————————————————————————————
         # 🐢 CC Bump Reminder Listener
         # ————————————————————————————————
@@ -232,7 +249,7 @@ class MessageCreateListener(commands.Cog):
         # ————————————————————————————————
         # 🐢 Code Claim Listener
         # ————————————————————————————————
-        if triggers["code_use"].lower() in content.lower():
+        if content and CODE_USE_PATTERN.search(content):
             try:
                 await send_code_claim_to_rs(bot=self.bot, message=message)
                 pretty_log(
@@ -269,6 +286,40 @@ class MessageCreateListener(commands.Cog):
                     label="DONATION_LISTENER",
                 )
                 await give_command_listener(self.bot, message)
+        # ————————————————————————————————
+        # 🐢 Golden Stone Listener
+        # ————————————————————————————————
+        if content and triggers["golden_stone"] in content.lower():
+            try:
+                await golden_stone_listener(bot=self.bot, message=message)
+                pretty_log(
+                    "ready",
+                    f"Successfully processed golden stone claim from message ID {getattr(message, 'id', 'unknown')}",
+                )
+            except Exception as e:
+                pretty_log(
+                    "critical",
+                    f"Failed processing golden stone claim from message ID {getattr(message, 'id', 'unknown')}: {e}",
+                )
+        # ————————————————————————————————
+        # 🐢 Battle Frontier Listener
+        # ————————————————————————————————
+        if content and triggers["battle_frontier_ach"] in content.lower():
+            try:
+                pretty_log(
+                    "info",
+                    f"Detected Battle Frontier achievement in message ID {getattr(message, 'id', 'unknown')}",
+                )
+                await handle_battle_frontier_achievement(bot=self.bot, message=message)
+                pretty_log(
+                    "ready",
+                    f"Successfully processed Battle Frontier achievement from message ID {getattr(message, 'id', 'unknown')}",
+                )
+            except Exception as e:
+                pretty_log(
+                    "critical",
+                    f"Failed processing Battle Frontier achievement from message ID {getattr(message, 'id', 'unknown')}: {e}",
+                )
 
 
 # 🟣────────────────────────────────────────────
