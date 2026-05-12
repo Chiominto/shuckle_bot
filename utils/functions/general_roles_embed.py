@@ -155,6 +155,8 @@ def build_general_roles_embed(guild: discord.Guild, user: discord.Member):
         calm_waters = guild.get_role(CELESTIAL_ROLES.calm_waters)
         shiny_bonus = guild.get_role(CELESTIAL_ROLES.shiny_bonus)
         os_lotto_ping = guild.get_role(CELESTIAL_ROLES.os_lottery)
+        incense_ping = guild.get_role(CELESTIAL_ROLES.incense_ping)
+        patreon_auctions_ping = guild.get_role(CELESTIAL_ROLES.patreon_auctions_ping)
         as_spawn_ping = guild.get_role(CELESTIAL_ROLES.as_spawn_ping)
         as_rare_spawn_ping = guild.get_role(CELESTIAL_ROLES.as_rarespawn_ping)
 
@@ -195,14 +197,14 @@ def build_general_roles_embed(guild: discord.Guild, user: discord.Member):
             )
             roles.append((emoji, trade_ads_role))
 
-        if os_lotto_ping:
+        if os_lotto_ping and clan_member_role in user.roles:
             emoji = "🎰"
             view.add_item(
                 ToggleRoleButton(role=os_lotto_ping, label="OS Lotto Ping", emoji=emoji)
             )
             roles.append((emoji, os_lotto_ping))
 
-        if shiny_bonus:
+        if shiny_bonus and clan_member_role in user.roles:
             emoji = "✨"
             view.add_item(
                 ToggleRoleButton(
@@ -211,7 +213,27 @@ def build_general_roles_embed(guild: discord.Guild, user: discord.Member):
             )
             roles.append((emoji, shiny_bonus))
 
-        if ee_spawn_ping:
+        if incense_ping and clan_member_role in user.roles:
+            emoji = Emojis.incense
+            view.add_item(
+                ToggleRoleButton(
+                    role=incense_ping, label="Incense Ping", emoji=emoji
+                )
+            )
+            roles.append((emoji, incense_ping))
+
+        if patreon_auctions_ping and clan_member_role in user.roles:
+            emoji = "💎"
+            view.add_item(
+                ToggleRoleButton(
+                    role=patreon_auctions_ping,
+                    label="Patreon Auctions Ping",
+                    emoji=emoji,
+                )
+            )
+            roles.append((emoji, patreon_auctions_ping))
+
+        if ee_spawn_ping and clan_member_role in user.roles:
             emoji = Emojis.gigantamax
             view.add_item(
                 ToggleRoleButton(role=ee_spawn_ping, label="EE Spawn Ping", emoji=emoji)

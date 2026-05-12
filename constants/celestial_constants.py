@@ -112,7 +112,8 @@ class CELESTIAL_CATEGORIES:
 #       CELESTIAL_ROLES
 # 💦☁────────────────────────────────────────────💦☁
 class CELESTIAL_ROLES:
-
+    patreon_auctions_ping = 1503623758840205473
+    incense_ping = 1503619991486857296
     personal_role_divider = 1500689908715622512
     giveaways = 1493045397575438470
     _unknown = 1490876248577020086

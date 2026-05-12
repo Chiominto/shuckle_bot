@@ -28,6 +28,12 @@ from utils.listener_func.shiny_bonus_listener import (
 from utils.listener_func.wb_rs import handle_wb_rewards
 from utils.logs.pretty_log import pretty_log
 from utils.quick_codes.sync_donation_roles import sync_donation_roles
+from utils.listener_func.incense_listener import (
+    incense_command_handler,
+    incense_depleted_handler,
+    incense_use_handler,
+    server_has_incense_handler,
+)
 
 CC_MH_REPORT_CHANNEL_ID = 1502156762466357338
 triggers = {
@@ -39,6 +45,10 @@ triggers = {
     "code_use": "<:checkedbox:752302633141665812> you used a code to claim a :gift:",
     "golden_stone": "to claim your <:golden_",
     "battle_frontier_ach": "🎖️ you may continue your",
+    "incense_command": "Incense charges are shared & used by every player in this server",
+    "has_incense": "<:incense:1202436296874922065> An `;incense` is currently active in this server!",
+    "incense_depleted": "your server's incense has run out!",
+    "incense_use": "Incense. Your server has received the following benefits",
 }
 from utils.listener_func.donation_listener import (
     clan_donate_listener,
@@ -320,7 +330,36 @@ class MessageCreateListener(commands.Cog):
                     "critical",
                     f"Failed processing Battle Frontier achievement from message ID {getattr(message, 'id', 'unknown')}: {e}",
                 )
+        # ————————————————————————————————
+        # 🩵 Incense Listeners
+        # ————————————————————————————————
+        if first_embed:
+            # Incense Command Handler
+            if triggers["incense_command"] in first_embed_footer:
+                pretty_log(
+                    "info",
+                    f"Detected incense command embed from PokéMeow bot: Message ID {message.id}",
+                    label="Incense Command Handler",
+                )
+                await incense_command_handler(bot=self.bot, message=message)
+        if message.content and triggers["incense_use"] in message.content:
+            pretty_log(
+                "info",
+                f"Detected incense use message from PokéMeow bot: Message ID {message.id}",
+                label="Incense Use Handler",
+            )
+            await incense_use_handler(bot=self.bot, message=message)
 
+        if message.content and triggers["has_incense"] in message.content:
+            await server_has_incense_handler(bot=self.bot, message=message)
+
+        if message.content and triggers["incense_depleted"] in message.content:
+            pretty_log(
+                "info",
+                f"Detected incense depleted message from PokéMeow bot: Message ID {message.id}",
+                label="Incense Depleted Handler",
+            )
+            await incense_depleted_handler(bot=self.bot, message=message)
 
 # 🟣────────────────────────────────────────────
 #         🐢 Setup Function

@@ -55,3 +55,14 @@ pokemon_list_cache: dict[str, int] = {}
 # pokemon_list_cache = {
 #     "pokemon_name": "dex_number",
 #     }
+
+
+# 🧩────────────────────────────────────────────
+#        ⚡ Ping Message ID Cache
+# 🧩────────────────────────────────────────────
+ping_message_id_cache: dict[str, int] = {}
+# Structure:
+# {
+# type: message_id,
+#   ...
+# }
