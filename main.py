@@ -6,17 +6,18 @@ from discord import app_commands
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
+from utils.background_tasks.scheduled_tasks.scheduler import setup_schedulers
 from utils.cache.central_cache_loader import load_all_cache
 from utils.db.get_pg_pool import get_pg_pool
-from utils.logs.pretty_log import pretty_log, set_bot
-from utils.background_tasks.scheduled_tasks.scheduler import setup_schedulers
 from utils.functions.persist_views import register_persistent_views
+from utils.logs.pretty_log import pretty_log, set_bot
 
 # ---- Intents / Bot ----
 intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
 intents.guilds = True
+intents.reactions = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 set_bot(bot)
 
@@ -26,10 +27,7 @@ set_bot(bot)
 # ❀───────────────────────────────❀
 @bot.tree.error
 async def on_app_command_error(interaction, error):
-    from utils.functions.role_checks import (
-        OwnerCoownerCheckFailure,
-        StaffCheckFailure,
-    )
+    from utils.functions.role_checks import OwnerCoownerCheckFailure, StaffCheckFailure
 
     if isinstance(error, OwnerCoownerCheckFailure):
         await interaction.response.send_message(str(error), ephemeral=True)
@@ -53,7 +51,6 @@ async def on_app_command_error(interaction, error):
 #         ⚡ Hourly Cache Refresh Task ⚡
 # 🟣────────────────────────────────────────────
 @tasks.loop(hours=1)
-
 async def refresh_all_caches():
     if not hasattr(refresh_all_caches, "_has_run"):
         refresh_all_caches._has_run = True
@@ -128,6 +125,8 @@ async def on_ready():
         await bot.change_presence(activity=discord.Game(name="🐢 /commands"))
     except Exception:
         pass
+
+
 # 🟣────────────────────────────────────────────
 #         ⚡ Main ⚡
 # 🟣────────────────────────────────────────────
@@ -164,9 +163,7 @@ async def main():
             break
         except Exception as e:
             pretty_log("error", f"Bot crashed: {e}", include_trace=True)
-            pretty_log(
-                "ready", f"Restarting Shuckle Bot in {retry_delay} seconds..."
-            )
+            pretty_log("ready", f"Restarting Shuckle Bot in {retry_delay} seconds...")
             await asyncio.sleep(retry_delay)
             retry_delay = min(retry_delay * 2, 60)
 

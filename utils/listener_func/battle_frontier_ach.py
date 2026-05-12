@@ -38,7 +38,7 @@ class BF_AUTHOR_IMAGE_URL:
     factory = "https://media.discordapp.net/attachments/1484878359929557174/1497205774370209812/1480698201630834738.png?ex=69ecad09&is=69eb5b89&hm=dd542980389fa5d3a139f8a1bc32dbb7f62e87a1d25b6a916594abea1640fafb&=&format=webp&quality=lossless&width=90&height=68"
 
 
-enable_debug(f"{__name__}.handle_battle_frontier_achievement")
+#enable_debug(f"{__name__}.handle_battle_frontier_achievement")
 TESTING = False
 symbol_map = {
     "gold knowledge symbol": {

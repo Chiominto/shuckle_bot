@@ -54,6 +54,7 @@ class Emojis:
     silver_luck_symbol = "<:silver_luck_symbol:1503204146503745636>"
     silver_guts_symbol = "<:silver_guts_symbol:1503204008582709258>"
     gold_guts_symbol = "<:gold_guts_symbol:1503213579870928956>"
+    alien_twerk = "<:AlienThrowBack:1502799054063796275>"
 
 class Thumbnails:
     BATTLE_TOWER = "https://media.discordapp.net/attachments/1394913073520967680/1420593124379459605/image.png?ex=68d5f5f2&is=68d4a472&hm=2848b1f5b21259c320e3a46fc83368c251b18f7b5b7e3cc5e271581bd583f2a5&=&format=webp&quality=lossless&width=576&height=576"

@@ -14,6 +14,7 @@ CC_MH_REPORT_CHANNEL_ID = 1502156762466357338
 #       CELESTIAL_TEXT_CHANNELS
 # 💦☁────────────────────────────────────────────💦☁
 class CELESTIAL_TEXT_CHANNELS:
+    stellar_flex = 1502797917004759294
     clan_guide = 1493874658347450441
     summit_reports = 1502062266676285522
 
