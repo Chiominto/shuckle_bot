@@ -58,6 +58,7 @@ class Emojis:
     incense = "<:incense:1503626182137090199>"
 
 class Thumbnails:
+    BLUE_SPARKLE = "https://media.discordapp.net/attachments/1394913073520967680/1420601426471555093/image.png?ex=68d5fdad&is=68d4ac2d&hm=a3f2414a9284164c72cbc67f3fb2e33b3b5c471d33ac4d864dfbc94c7f689532&=&format=webp&quality=lossless&width=576&height=576"
     incense = "https://cdn.discordapp.com/attachments/1394913073520967680/1456087749982552188/1202436296874922065.png?ex=6a03cb64&is=6a0279e4&hm=cec04826d3b26c32c79d71559fed8c06c30dcc41955885411fb12621baa3d5fe"
     BATTLE_TOWER = "https://media.discordapp.net/attachments/1394913073520967680/1420593124379459605/image.png?ex=68d5f5f2&is=68d4a472&hm=2848b1f5b21259c320e3a46fc83368c251b18f7b5b7e3cc5e271581bd583f2a5&=&format=webp&quality=lossless&width=576&height=576"
     command = "https://media.discordapp.net/attachments/1393740397905313912/1492443708900249650/image.png?ex=69db5a04&is=69da0884&hm=ac848a967c1eb849cb32221a21451f82f828ba66f9f771cd285e9bc0b106135b&=&format=webp&quality=lossless&width=480&height=480"

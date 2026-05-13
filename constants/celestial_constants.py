@@ -112,6 +112,11 @@ class CELESTIAL_CATEGORIES:
 #       CELESTIAL_ROLES
 # 💦☁────────────────────────────────────────────💦☁
 class CELESTIAL_ROLES:
+    golden_fry_disciple = 1500474832544993431
+    supernova = 1502139222562443294
+    nebula = 1503623411165954068
+    comet = 1503623452785905766
+    former_clan_member = 1503920773587406939
     patreon_auctions_ping = 1503623758840205473
     incense_ping = 1503619991486857296
     personal_role_divider = 1500689908715622512

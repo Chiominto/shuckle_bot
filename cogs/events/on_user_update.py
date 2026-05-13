@@ -1,12 +1,19 @@
+from datetime import datetime
+
 import discord
 from discord.ext import commands
 
-from constants.celestial_constants import CELESTIAL_TEXT_CHANNELS, DEFAULT_EMBED_COLOR, CELESTIAL_SERVER_ID
+from constants.celestial_constants import (
+    CELESTIAL_SERVER_ID,
+    CELESTIAL_TEXT_CHANNELS,
+    DEFAULT_EMBED_COLOR,
+)
+from utils.cache.cache_list import celestial_members_cache
+from utils.db.general_db import update_username_in_dbs
 from utils.functions.webhook_func import send_webhook
 from utils.logs.pretty_log import pretty_log
-from utils.cache.cache_list import celestial_members_cache
-from datetime import datetime
-from utils.db.general_db import update_username_in_dbs
+
+
 # 🟣────────────────────────────────────────────
 #         🐢 Username Update Listener Cog
 # 🟣────────────────────────────────────────────
@@ -48,19 +55,16 @@ class OnUserUpdateCog(commands.Cog):
                     label="UsernameUpdate",
                 )
                 return
-            title = "✏️ Guest Username Changed",
+            title = "✏️ Guest Username Changed"
             note = ""
             clan_member = False
             if member.id in celestial_members_cache:
-                title = "✏️ Clan Member Username Changed",
-                note = "Kindly tell memeber to do `;username` to update their username in Pokemeow too."
+                title = "✏️ Clan Member Username Changed"
+                note = "Kindly tell member to do `;username` to update their username in Pokemeow too."
                 clan_member = True
 
-
             embed = discord.Embed(
-                title=title,
-                color=DEFAULT_EMBED_COLOR,
-                description=note
+                title=title, color=DEFAULT_EMBED_COLOR, description=note
             )
             embed.set_author(
                 name=str(after),
@@ -70,7 +74,10 @@ class OnUserUpdateCog(commands.Cog):
             embed.add_field(name="After", value=after.name, inline=True)
             embed.timestamp = datetime.now()
             embed.set_thumbnail(url=after.display_avatar.url)
-            embed.set_footer(text=f"User ID: {after.id}", icon_url=guild.icon.url if guild.icon else None)
+            embed.set_footer(
+                text=f"User ID: {after.id}",
+                icon_url=guild.icon.url if guild.icon else None,
+            )
 
             await send_webhook(self.bot, log_channel, embed=embed)
             if clan_member:

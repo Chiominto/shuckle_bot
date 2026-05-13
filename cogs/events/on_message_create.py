@@ -11,6 +11,11 @@ from constants.celestial_constants import (
     POKEMEOW_APPLICATION_ID,
 )
 from utils.listener_func.battle_frontier_ach import handle_battle_frontier_achievement
+from utils.listener_func.channel_boost import (
+    boost_channel_listener,
+    remove_boosted_channel_listener,
+)
+from utils.listener_func.channel_myboost_listener import my_boosted_channel_listener
 from utils.listener_func.clan_invite_listener import clan_invite_listener
 from utils.listener_func.code_use_listener import send_code_claim_to_rs
 from utils.listener_func.ee_spawn_listener import (
@@ -21,6 +26,12 @@ from utils.listener_func.ee_spawn_listener import (
 )
 from utils.listener_func.golden_stone_listener import golden_stone_listener
 from utils.listener_func.icon_unlock_listener import icon_unlock_listener
+from utils.listener_func.incense_listener import (
+    incense_command_handler,
+    incense_depleted_handler,
+    incense_use_handler,
+    server_has_incense_handler,
+)
 from utils.listener_func.shiny_bonus_listener import (
     handle_pokemeow_global_bonus,
     read_shiny_bonus_timestamp_from_cc_channel,
@@ -28,15 +39,12 @@ from utils.listener_func.shiny_bonus_listener import (
 from utils.listener_func.wb_rs import handle_wb_rewards
 from utils.logs.pretty_log import pretty_log
 from utils.quick_codes.sync_donation_roles import sync_donation_roles
-from utils.listener_func.incense_listener import (
-    incense_command_handler,
-    incense_depleted_handler,
-    incense_use_handler,
-    server_has_incense_handler,
-)
 
 CC_MH_REPORT_CHANNEL_ID = 1502156762466357338
 triggers = {
+    "channel_boost": "<:checkedbox:752302633141665812> successfully applied a +5% channel boost to",
+    "remove_channel_boost": "<:checkedbox:752302633141665812> successfully removed the channel boost from channel",
+    "channel_my_boost": "<:channel_boost:1334580555374919680> your channel boosts (across all servers)",
     "icon_unlock": "as your icon with `/battle set-icon",
     "global_bonus": "Global bonuses",
     "wb_spawn": "spawned a world boss using 1x <:boss_coin:1249165805095092356>",
@@ -50,6 +58,7 @@ triggers = {
     "incense_depleted": "your server's incense has run out!",
     "incense_use": "Incense. Your server has received the following benefits",
 }
+from utils.listener_func.calculations import computation_listener
 from utils.listener_func.donation_listener import (
     clan_donate_listener,
     give_command_listener,
@@ -61,6 +70,7 @@ from utils.listener_func.ms_reports import relay_meowsummit_reports
 CLAN_BANK_USER_NAMES = ["burgersbank"]
 CC_SHINY_BONUS_CHANNEL_ID = 1457171231445876746
 CODE_USE_PATTERN = re.compile(r"\byou used a code to claim\b", re.IGNORECASE)
+VALID_MATH_OPERANDS = ["+", "-", "*", "/", "(", ")", " ", "**", "%"]
 
 
 # 🟣────────────────────────────────────────────
@@ -92,6 +102,16 @@ class MessageCreateListener(commands.Cog):
             and not message.webhook_id
         ):
             await should_delete_market_message(message)
+
+        # ————————————————————————————————
+        # 🐢 Computations
+        # ————————————————————————————————
+        if (
+            message.content
+            and not message.author.bot
+            and message.content.lower().startswith("cal ")
+        ):
+            await computation_listener(message)
 
         # ————————————————————————————————
         # 🐢 Khy Quick Codes
@@ -360,6 +380,54 @@ class MessageCreateListener(commands.Cog):
                 label="Incense Depleted Handler",
             )
             await incense_depleted_handler(bot=self.bot, message=message)
+        # 🎉────────────────────────────────────────────
+        #   🍀 Channel Boost Listener
+        # 🎉────────────────────────────────────────────
+        if triggers["channel_boost"].lower() in content.lower():
+            try:
+                await boost_channel_listener(bot=self.bot, message=message)
+                pretty_log(
+                    "ready",
+                    f"Successfully processed channel boost from message ID {getattr(message, 'id', 'unknown')}",
+                )
+            except Exception as e:
+                pretty_log(
+                    "critical",
+                    f"Failed processing channel boost from message ID {getattr(message, 'id', 'unknown')}: {e}",
+                )
+        # 🎉────────────────────────────────────────────
+        #   😢 Remove Boost Listener
+        # 🎉────────────────────────────────────────────
+        if triggers["remove_channel_boost"].lower() in content.lower():
+            try:
+                await remove_boosted_channel_listener(bot=self.bot, message=message)
+                pretty_log(
+                    "ready",
+                    f"Successfully processed remove channel boost from message ID {getattr(message, 'id', 'unknown')}",
+                )
+            except Exception as e:
+                pretty_log(
+                    "critical",
+                    f"Failed processing remove channel boost from message ID {getattr(message, 'id', 'unknown')}: {e}",
+                )
+
+        # 🌟────────────────────────────────────────────
+        #   💠 My Boosted Channel Listener
+        # 🌟────────────────────────────────────────────
+        if triggers["channel_my_boost"].lower() in embed_title.lower() and embed_title:
+
+            try:
+                await my_boosted_channel_listener(bot=self.bot, message=message)
+                pretty_log(
+                    "ready",
+                    f"Successfully processed my boosted channels from message ID {getattr(message, 'id', 'unknown')}",
+                )
+            except Exception as e:
+                pretty_log(
+                    "critical",
+                    f"Failed processing my boosted channels from message ID {getattr(message, 'id', 'unknown')}: {e}",
+                )
+
 
 # 🟣────────────────────────────────────────────
 #         🐢 Setup Function
