@@ -52,8 +52,8 @@ async def send_code_claim_to_rs(
         member = await get_pokemeow_reply_member(message=message)
         if not member:
             pretty_log(
-                "critical",
-                f"Failed to fetch member from message ID {message.id}",
+                "warn",
+                f"Skipping code-claim rare-spawn post: could not resolve replied member for message ID {message.id}",
             )
             return
 

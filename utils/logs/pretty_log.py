@@ -1,3 +1,4 @@
+import sys
 import traceback
 from datetime import datetime
 
@@ -47,9 +48,7 @@ MAIN_COLORS = {
     "reset": COLOR_RESET,
 }
 # -------------------- ⚠️ Critical Logs Channel --------------------
-CRITICAL_LOG_CHANNEL_ID = (
-    1444997181244444672  # CC Error Logs
-)
+CRITICAL_LOG_CHANNEL_ID = 1444997181244444672  # CC Error Logs
 CRITICAL_LOG_CHANNEL_LIST = [
     1410202143570530375,  # Ghouldengo Bot Logs
     CC_ERROR_LOGS_CHANNEL_ID,
@@ -87,8 +86,10 @@ def pretty_log(
     log_message = f"{color}[{now}] {prefix_part}{label_str}{message}{COLOR_RESET}"
     print(log_message)
 
+    has_active_exception = sys.exc_info()[0] is not None
+
     # Optionally print traceback
-    if include_trace and tag in ("error", "critical"):
+    if include_trace and has_active_exception and tag in ("error", "critical"):
         traceback.print_exc()
 
     # Send to all Discord channels in the list if bot available
@@ -99,7 +100,11 @@ def pretty_log(
                 channel = bot_to_use.get_channel(channel_id)
                 if channel:
                     full_message = f"{prefix_part}{label_str}{message}"
-                    if include_trace and tag in ("error", "critical"):
+                    if (
+                        include_trace
+                        and has_active_exception
+                        and tag in ("error", "critical")
+                    ):
                         full_message += f"\n```py\n{traceback.format_exc()}```"
                     if len(full_message) > 2000:
                         full_message = full_message[:1997] + "..."

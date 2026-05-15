@@ -1,5 +1,6 @@
 import discord
 
+
 async def get_pokemeow_reply_member(message: discord.Message) -> discord.Member | None:
     """
     Determines if the message is a PokéMeow bot reply.
@@ -16,6 +17,18 @@ async def get_pokemeow_reply_member(message: discord.Message) -> discord.Member 
         return None
 
     resolved_msg = getattr(message.reference, "resolved", None)
+
+    # Fallback for uncached replied messages.
+    if not isinstance(resolved_msg, discord.Message):
+        ref_message_id = getattr(message.reference, "message_id", None)
+        if not ref_message_id:
+            return None
+
+        try:
+            resolved_msg = await message.channel.fetch_message(ref_message_id)
+        except (discord.NotFound, discord.Forbidden, discord.HTTPException):
+            return None
+
     if not isinstance(resolved_msg, discord.Message):
         return None
 
