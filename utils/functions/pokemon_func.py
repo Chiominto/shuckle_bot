@@ -1,3 +1,5 @@
+import re
+
 from constants.aesthetics import *
 from constants.paldea_galar_dict import dex, rarity_meta
 from constants.pokemons import *
@@ -198,45 +200,45 @@ def format_price_w_coin(n: int | float | str | None) -> str:
 #            ⭐ Rarity Detection
 # ✨───────────────────────────────────────────────
 
+# Precompile the regex for Unown forms
+UNOWN_REGEX = re.compile(r"unown-[a-z!?]+$")
 
-def get_rarity(pokemon: str):
+
+def get_rarity(pokemon: str) -> str | None:
     """Determines Pokémon rarity from its name."""
-
     name = pokemon.lower()
 
+    # Check for specific rarities
     if "golden" in name:
         return "golden"
-
     if "shiny" in name and "gigantamax" in name:
         return "shiny gigantamax"
-
     if "shiny" in name and "mega" in name:
         return "shiny mega"
-
     if "shiny" in name:
         return "shiny"
-
     if "gigantamax" in name:
         return "gigantamax"
-
     if "mega" in name and "yanmega" not in name and "meganium" not in name:
         return "mega"
 
+    # Check for rarity sets
     if name in legendary_set:
         return "legendary"
-
     if name in superrare_set:
         return "superrare"
-
     if name in rare_set:
         return "rare"
-
     if name in uncommon_set:
         return "uncommon"
-
     if name in common_set:
         return "common"
 
+    # Check for Unown forms
+    if UNOWN_REGEX.match(name):
+        return "superrare"
+
+    # Default case
     return None
 
 

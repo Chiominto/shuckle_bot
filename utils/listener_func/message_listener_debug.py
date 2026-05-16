@@ -7,7 +7,7 @@ from utils.listener_func.code_use_listener import send_code_claim_to_rs
 from utils.listener_func.golden_stone_listener import golden_stone_listener
 from utils.logs.debug_log import debug_enabled, debug_log, enable_debug
 from utils.logs.pretty_log import pretty_log
-
+from utils.listener_func.unown_unlocks import process_unown_unlock
 # enable_debug(f"{__name__}.handle_test_message")
 triggers = {
     "battle_frontier_ach": "🎖️ You may continue your",
@@ -63,4 +63,26 @@ async def handle_test_message(bot: discord.Client, message: discord.Message):
             pretty_log(
                 "critical",
                 f"Failed processing code claim from message ID {getattr(message, 'id', 'unknown')}: {e}",
+            )
+    # 🌟────────────────────────────────────────────
+    #   💠 Unown Unlock Handler
+    # 🌟────────────────────────────────────────────
+    if (
+        replied_message_content
+        and "unown ruins reward:" in replied_message_content
+        and (
+            "<:superrare:" in replied_message_content
+            or "<:shiny:" in replied_message_content
+        )
+    ):
+        try:
+            await process_unown_unlock(bot=bot, message=replied_message)
+            pretty_log(
+                "ready",
+                f"Successfully processed Unown unlock from message ID {getattr(message, 'id', 'unknown')}",
+            )
+        except Exception as e:
+            pretty_log(
+                "critical",
+                f"Failed processing Unown unlock from message ID {getattr(message, 'id', 'unknown')}: {e}",
             )

@@ -39,7 +39,7 @@ from utils.listener_func.shiny_bonus_listener import (
 from utils.listener_func.wb_rs import handle_wb_rewards
 from utils.logs.pretty_log import pretty_log
 from utils.quick_codes.sync_donation_roles import sync_donation_roles
-
+from utils.listener_func.unown_unlocks import process_unown_unlock
 CC_MH_REPORT_CHANNEL_ID = 1502156762466357338
 triggers = {
     "channel_boost": "<:checkedbox:752302633141665812> successfully applied a +5% channel boost to",
@@ -167,6 +167,7 @@ class MessageCreateListener(commands.Cog):
         # 🐢 Message Variables
         # ————————————————————————————————
         content = message.content
+        lowered_content = content.lower() if content else ""
         first_embed = message.embeds[0] if message.embeds else None
         first_embed_author = (
             first_embed.author.name if first_embed and first_embed.author else ""
@@ -426,6 +427,27 @@ class MessageCreateListener(commands.Cog):
                 pretty_log(
                     "critical",
                     f"Failed processing my boosted channels from message ID {getattr(message, 'id', 'unknown')}: {e}",
+                )
+        # 🌟────────────────────────────────────────────
+        #   💠 Unown Unlock Handler
+        # 🌟────────────────────────────────────────────
+        if (
+            content
+            and "unown ruins reward:" in lowered_content
+            and ("<:superrare:" in lowered_content or "<:shiny:" in lowered_content)
+        ):
+            try:
+                await process_unown_unlock(bot=self.bot, message=message)
+                pretty_log(
+                    "ready",
+                    f"Successfully processed Unown unlock from message ID {getattr(message, 'id', 'unknown')}",
+
+                )
+            except Exception as e:
+                pretty_log(
+                    "critical",
+                    f"Failed processing Unown unlock from message ID {getattr(message, 'id', 'unknown')}: {e}",
+
                 )
 
 

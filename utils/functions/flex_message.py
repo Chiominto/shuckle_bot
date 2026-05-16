@@ -86,8 +86,13 @@ async def new_flex_message_handler(bot: discord.Client, message: discord.Message
         embed_description = replace_mapped_emojis(
             message.embeds[0].description if message.embeds else ""
         )
-        final_embed_description = embed_description or message_content or ""
+        final_embed_description = embed_description
+        if embed_description:
+            final_embed_description = embed_description
+        elif message_content:
+            final_embed_description = message_content
         jump_url = message.jump_url
+        channel_jump_text = f"[{message.channel.name}]({jump_url})" if jump_url else ""
         jump_url_text = f"[Jump to original message]({jump_url})" if jump_url else ""
         if final_embed_description and jump_url_text:
             embed_description = f"{final_embed_description}\n\n{jump_url_text}"
@@ -128,7 +133,21 @@ async def new_flex_message_handler(bot: discord.Client, message: discord.Message
                 field_value = replace_mapped_emojis(field.value)
                 embed.add_field(name=field_name, value=field_value, inline=field.inline)
 
-        flex_content = f"{Emojis.alien_twerk} | {message.channel.mention}"
+        # Update flex_content logic
+        if embed_description and message_content:
+            flex_content = (
+                f"{Emojis.alien_twerk} | {channel_jump_text}\n\n{message_content}"
+            )
+        else:
+            flex_content = f"{Emojis.alien_twerk} | {channel_jump_text}"
+
+        # Add original footer to the embed
+        if message.embeds and message.embeds[0].footer:
+            embed.set_footer(
+                text=message.embeds[0].footer.text,
+                icon_url=message.embeds[0].footer.icon_url,
+            )
+
         await flex_channel.send(content=flex_content, embed=embed)
         await upsert_flex_message(bot=bot, message=message)
     except Exception as e:
