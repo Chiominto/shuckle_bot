@@ -8,6 +8,7 @@ from constants.celestial_constants import (
     CC_SERVER_ID,
     CELESTIAL_SERVER_ID,
     CELESTIAL_TEXT_CHANNELS,
+    CELESTIAL_ROLES
 )
 
 LOG_CHANNEL_ID = CELESTIAL_TEXT_CHANNELS.server_logs
@@ -29,6 +30,7 @@ class OnGuildJoinCog(commands.Cog):
         bot_owner = self.bot.get_user(BURGER_USER_ID)
         bot_name = self.bot.user.name if self.bot.user else "the bot"
         main_guild: discord.Guild = self.bot.get_guild(CELESTIAL_SERVER_ID)
+
         if guild.id not in ALLOWED_GUILD_IDS:
             # Log the event to server log channel
             log_channel = main_guild.get_channel(LOG_CHANNEL_ID)
