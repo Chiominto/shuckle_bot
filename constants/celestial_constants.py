@@ -112,6 +112,7 @@ class CELESTIAL_CATEGORIES:
 #       CELESTIAL_ROLES
 # 💦☁────────────────────────────────────────────💦☁
 class CELESTIAL_ROLES:
+    cosmic_catch_goal = 1505715488469024970
     info_divider = 1500685625849024696
     ping_divider = 1500685544902885447
     golden_fry_disciple = 1500474832544993431

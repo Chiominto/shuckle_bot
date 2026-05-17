@@ -26,6 +26,7 @@ async def reset_donation_roles(bot: discord.Client):
     donated_role = guild.get_role(CELESTIAL_ROLES.tip_jar_titan)
     not_donated_role = guild.get_role(CELESTIAL_ROLES.coin_saver)
     celestial_nova_role = guild.get_role(CELESTIAL_ROLES.celestialnova_)
+    cosmic_catch_goal_role = guild.get_role(CELESTIAL_ROLES.cosmic_catch_goal)
     if not clan_bank_channel:
         pretty_log(
             "error",
@@ -48,7 +49,15 @@ async def reset_donation_roles(bot: discord.Client):
         )
 
         return
+    if not cosmic_catch_goal_role:
+        pretty_log(
+            "error",
+            "Cosmic Catch Goal role not found in guild",
+            label="DonationRoleReset",
+        )
+        return
     sent_message = None
+    failed_role_updates = 0
     overwrite_bank_channel = clan_bank_channel.overwrites_for(celestial_nova_role)
     original_send_messages = overwrite_bank_channel.send_messages
     try:
@@ -92,6 +101,7 @@ async def reset_donation_roles(bot: discord.Client):
                     )
                     await asyncio.sleep(0.5)
                 except Exception as e:
+                    failed_role_updates += 1
                     pretty_log(
                         "error",
                         f"Error removing donated role from {member.name} ({member.id}): {e}",
@@ -106,10 +116,30 @@ async def reset_donation_roles(bot: discord.Client):
                     )
                     await asyncio.sleep(0.5)
                 except Exception as e:
+                    failed_role_updates += 1
                     pretty_log(
                         "error",
                         f"Error adding not donated role to {member.name} ({member.id}): {e}",
                     )
+            if cosmic_catch_goal_role in member.roles:
+                # Remove the Cosmic Catch Goal role if they have it, since the goal resets weekly
+                try:
+                    await member.remove_roles(
+                        cosmic_catch_goal_role,
+                        reason="Scheduled donation role reset - weekly goal reset",
+                    )
+                    pretty_log(
+                        "info",
+                        f"Removed Cosmic Catch Goal role from {member.name} ({member.id})",
+                    )
+                    await asyncio.sleep(0.5)
+                except Exception as e:
+                    failed_role_updates += 1
+                    pretty_log(
+                        "error",
+                        f"Error removing Cosmic Catch Goal role from {member.name} ({member.id}): {e}",
+                    )
+
     finally:
         overwrite_bank = clan_bank_channel.overwrites_for(celestial_nova_role)
         overwrite_bank.send_messages = original_send_messages
@@ -124,6 +154,17 @@ async def reset_donation_roles(bot: discord.Client):
                 await sent_message.delete()
             except Exception as e:
                 pretty_log("warning", f"Error deleting status message: {e}")
+    if failed_role_updates > 0:
+        pretty_log(
+            "warning",
+            (
+                "Skipping donation reminder because role reset had "
+                f"{failed_role_updates} failed role update(s)."
+            ),
+            label="DonationRoleReset",
+        )
+        return
+
     content = f"<@&{CELESTIAL_ROLES.coin_saver}>, it's that time again drop your weekly <:PokeCoin:1255459577080840223> 100k coins and keep the stars in our system shining bright."
     try:
         await clan_bank_channel.send(content)
