@@ -2,7 +2,7 @@ from datetime import datetime
 
 import discord
 from discord.ext import commands
-from constants.celestial_constants import CELESTIAL_ROLES
+from constants.celestial_constants import CELESTIAL_ROLES, CELESTIAL_TEXT_CHANNELS
 
 from utils.logs.pretty_log import pretty_log
 from utils.db.temp_roles_db import upsert_temp_role
@@ -55,7 +55,7 @@ async def handle_role_add(
         text=f"User ID: {member.id} | Role ID: {role.id}",
         icon_url=member.guild.icon.url if member.guild.icon else None,
     )
-    role_log_channel = member.guild.get_channel(CELESTIAL_ROLES.role_logs)
+    role_log_channel = member.guild.get_channel(CELESTIAL_TEXT_CHANNELS.role_logs)
     await send_webhook(
         bot=bot,
         channel=role_log_channel,
