@@ -178,6 +178,7 @@ async def auto_clan_remove_func(
         # 🪄 Role references
         clan_member_role = guild.get_role(CELESTIAL_ROLES.celestialnova_)
 
+
         # 🧠 Log: Role check
         pretty_log(
             tag="info",

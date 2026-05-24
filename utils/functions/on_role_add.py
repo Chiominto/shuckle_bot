@@ -55,4 +55,9 @@ async def handle_role_add(
         text=f"User ID: {member.id} | Role ID: {role.id}",
         icon_url=member.guild.icon.url if member.guild.icon else None,
     )
-    await send_server_log(bot=bot, embed=embed)
+    role_log_channel = member.guild.get_channel(CELESTIAL_ROLES.role_logs)
+    await send_webhook(
+        bot=bot,
+        channel=role_log_channel,
+        embed=embed,
+    )

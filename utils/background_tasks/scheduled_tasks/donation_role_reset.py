@@ -165,7 +165,7 @@ async def reset_donation_roles(bot: discord.Client):
         )
         return
 
-    content = f"<@&{CELESTIAL_ROLES.coin_saver}>, it's that time again drop your weekly <:PokeCoin:1255459577080840223> 100k coins and keep the stars in our system shining bright."
+    content = f"<@&{CELESTIAL_ROLES.coin_saver}>, it's that time again drop your weekly <:PokeCoin:1493004284642590727> 100k coins and keep the stars in our system shining bright."
     try:
         await clan_bank_channel.send(content)
         pretty_log("info", "Sent donation reminder message in clan bank channel")

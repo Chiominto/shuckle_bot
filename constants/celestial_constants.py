@@ -23,6 +23,7 @@ class CELESTIAL_TEXT_CHANNELS:
     moderator_only = 1490470353099817033
     server_logs = 1490599209940947035
     message_logs = 1490599308012290138
+    role_logs = 1507956359469990078
     commands = 1490599712435212368
     todo_list = 1490602637878366208
 

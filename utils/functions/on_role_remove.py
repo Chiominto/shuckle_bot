@@ -8,6 +8,7 @@ from utils.db.temp_roles_db import delete_temp_role
 from utils.functions.webhook_func import send_server_log
 from utils.logs.pretty_log import pretty_log
 from utils.functions.server_booster_handler import handle_server_booster_role_remove
+from utils.functions.webhook_func import send_webhook
 
 TEMP_ROLE_IDS = [
     CELESTIAL_ROLES.coin_saver,
@@ -43,7 +44,7 @@ async def handle_role_remove(
     # ————————————————————————————————
     if role_id == CELESTIAL_ROLES.server_booster:
         await handle_server_booster_role_remove(bot, member)
-        
+
     # ————————————————————————————————
     # 🩵 Role Removal Logging
     # ————————————————————————————————
@@ -59,4 +60,9 @@ async def handle_role_remove(
         text=f"User ID: {member.id} | Role ID: {role.id}",
         icon_url=member.guild.icon.url if member.guild.icon else None,
     )
-    await send_server_log(bot=bot, embed=embed)
+    role_log_channel = member.guild.get_channel(CELESTIAL_ROLES.role_logs)
+    await send_webhook(
+        bot=bot,
+        channel=role_log_channel,
+        embed=embed,
+    )
