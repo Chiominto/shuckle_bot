@@ -13,6 +13,7 @@ from utils.logs.pretty_log import pretty_log
 
 from .battle_tower_reminder import send_battle_tower_closing_reminder
 from .donation_role_reset import reset_donation_roles
+from .monthly_stats_reminder import send_monthly_stats_reminder
 from .os_lotto_reminder import send_lotto_reminder
 from .schedule_manager import SchedulerManager
 
@@ -112,6 +113,22 @@ async def setup_schedulers(bot):
         schedules.append(f"🏰 Donation Role Reset scheduled for {readable_next_run}")
     except Exception as e:
         pretty_log("error", f"Failed to schedule Donation Role Reset: {e}")
+
+    # 📊 Monthly Stats Reminder — last day of month at 11:50 PM New York time
+    try:
+        monthly_stats_reminder = scheduler_manager.add_cron_job(
+            send_monthly_stats_reminder,
+            name="monthly_stats_reminder",
+            day="last",
+            hour=23,
+            minute=50,
+            timezone=NYC,
+            args=[bot],
+        )
+        readable_next_run = format_next_run_manila(monthly_stats_reminder.next_run_time)
+        schedules.append(f"📊 Monthly Stats Reminder scheduled for {readable_next_run}")
+    except Exception as e:
+        pretty_log("error", f"Failed to schedule Monthly Stats Reminder: {e}")
 
     schedule_checklist(schedules)
 
