@@ -62,18 +62,16 @@ class ChannelGroup(commands.Cog):
     # 📌 /channel edit
     # 🤍───────────────────────────────────────
     @channel.command(
-        name="edit", description="Edits the name or topic of your private channel"
+        name="edit", description="Edits the emoji or topic of your private channel"
     )
     @app_commands.describe(
         emoji="New custom emoji for your channel (must be a single default emoji)",
-        name="New name for your channel",
         topic="New topic for your channel",
     )
     async def channel_edit_func(
         self,
         interaction: discord.Interaction,
         emoji: str = None,
-        name: str = None,
         topic: str = None,
     ):
         slash_cmd_name = "channel edit"
@@ -84,7 +82,6 @@ class ChannelGroup(commands.Cog):
             interaction=interaction,
             slash_cmd_name=slash_cmd_name,
             emoji=emoji,
-            name=name,
             topic=topic,
         )
 

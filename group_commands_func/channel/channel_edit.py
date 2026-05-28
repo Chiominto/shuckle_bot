@@ -18,7 +18,7 @@ FLOWER_EMOJI = "❀"
 DOT = "."
 PLUS = "﹢"
 COMMA = "﹐"
-ALT_SEPARATORS = [".", "・", "﹒", "·", "ㆍ"]
+ALT_SEPARATORS = [".", "・", "﹒", "·", "ㆍ", "-", " "]
 MAX_NAME_LENGTH = 100
 MAX_TOPIC_LENGTH = 1024
 
@@ -33,8 +33,8 @@ def is_single_default_emoji(text: str) -> bool:
     return not contains_custom_emoji(text) and len(text.strip()) <= 2
 
 
-def parse_channel_name(current_name: str) -> tuple[str, str]:
-    """Parse supported channel name formats and return (emoji, base_name)."""
+def parse_channel_name(current_name: str) -> tuple[str, str, str]:
+    """Parse supported channel name formats and return (emoji, base_name, separator)."""
     if not current_name:
         raise ValueError("Channel name is empty")
 
@@ -45,7 +45,7 @@ def parse_channel_name(current_name: str) -> tuple[str, str]:
         if sep in name:
             left, right = name.split(sep, 1)
             if left.strip() and right.strip():
-                return left.strip(), right.strip()
+                return left.strip(), right.strip(), sep
 
     # Legacy format: emoji﹢name﹐...
     if PLUS in name and COMMA in name:
@@ -53,17 +53,17 @@ def parse_channel_name(current_name: str) -> tuple[str, str]:
         end_index = name.index(COMMA)
         base_name = name[start_index:end_index].strip()
         if base_name:
-            return name[0], base_name
+            return name[0], base_name, PLUS
 
     # Fallback: treat first visible char as emoji and strip common separators.
     first_char = name[0]
     base_name = name[1:].strip().lstrip(" .・﹒·ㆍ_,-﹢﹐")
     if base_name:
-        return first_char, base_name
+        return first_char, base_name, " "
 
-    # Final fallback keeps command usable for non-standard names.
+    # Final fallback
     if name:
-        return name[0], name
+        return name[0], name, " "
 
     raise ValueError("Channel name is empty after normalization")
 
@@ -78,7 +78,6 @@ async def channel_edit_func(
     bot: commands.Bot,
     interaction: discord.Interaction,
     emoji: str = None,
-    name: str = None,
     topic: str = None,
 ):
     # 🌟 Defer response
@@ -97,9 +96,9 @@ async def channel_edit_func(
         return
 
     # 🌟 Validate input
-    if not any([emoji, name, topic]):
+    if not any([emoji, topic]):
         await loader.error(
-            content="Please provide at least one field to update: emoji, name, or topic.",
+            content="Please provide at least one field to update: emoji or topic.",
         )
         return
 
@@ -128,10 +127,8 @@ async def channel_edit_func(
         try:
             channel = await bot.fetch_channel(channel_id)
         except discord.NotFound:
-
             msg = "I couldn't find your channel. Please contact staff."
             await loader.error(content=msg)
-
             pretty_log(
                 "critical",
                 f"{interaction.user}'s channel ({channel_id}) not found.",
@@ -153,9 +150,9 @@ async def channel_edit_func(
     new_name = None
 
     # 🌟 Build new channel name
-    if emoji or name:
+    if emoji:
         try:
-            old_emoji, old_base_name = parse_channel_name(old_name)
+            old_emoji, old_base_name, old_sep = parse_channel_name(old_name)
         except Exception:
             await loader.error(
                 content="⚠️ Failed to parse the channel name format.",
@@ -166,23 +163,17 @@ async def channel_edit_func(
             )
             return
 
-        new_raw_name = f"{emoji or old_emoji}{DOT}{name or old_base_name}"
+        new_raw_name = f"{emoji or old_emoji}{old_sep}{old_base_name}"
         if len(new_raw_name) > MAX_NAME_LENGTH:
-            await loader.error(
-                content="Channel name too long.",
-            )
+            await loader.error(content="Channel name too long.")
             return
         new_name = new_raw_name.lower()
 
     if topic and len(topic) > MAX_TOPIC_LENGTH:
-
         msg = (
             f"That topic is too long ({len(topic)} characters). Max is {MAX_TOPIC_LENGTH}.",
         )
-
-        await loader.error(
-            content=msg,
-        )
+        await loader.error(content=msg)
         return
 
     # 🌟 Apply changes
@@ -194,33 +185,19 @@ async def channel_edit_func(
         if topic:
             await channel.edit(topic=topic)
     except discord.Forbidden:
-        await loader.error(
-            content="I don't have permission to edit your channel.",
-        )
-        pretty_log(
-            "critical",
-            f"ForbiddenError editing {interaction.user}'s channel.",
-        )
+        await loader.error(content="I don't have permission to edit your channel.")
+        pretty_log("critical", f"ForbiddenError editing {interaction.user}'s channel.")
         return
     except discord.HTTPException as e:
         msg = f"Failed to edit the channel: {e.text}"
-
-        await loader.error(
-            content=msg,
-        )
+        await loader.error(content=msg)
         pretty_log(
-            "error",
-            f"HTTPException editing {interaction.user}'s channel: {e.text}",
+            "error", f"HTTPException editing {interaction.user}'s channel: {e.text}"
         )
         return
     except asyncio.TimeoutError:
-        await loader.error(
-            content="Channel update timed out.",
-        )
-        pretty_log(
-            "error",
-            f"TimeoutError editing {interaction.user}'s channel.",
-        )
+        await loader.error(content="Channel update timed out.")
+        pretty_log("error", f"TimeoutError editing {interaction.user}'s channel.")
         return
 
     update_cooldown(interaction.user.id, interaction.channel.id)
@@ -241,15 +218,9 @@ async def channel_edit_func(
     )
     embed.set_thumbnail(url=interaction.user.display_avatar.url)
     embed = design_embed(embed=embed, user=interaction.user)
+
     # 🌸 Success message
-    await loader.success(
-        content=f"Channel updated: {channel.mention}",
-        embed=embed,
-    )
+    await loader.success(content=f"Channel updated: {channel.mention}", embed=embed)
     await send_server_log(bot=bot, embed=embed)
 
-    # Pretty log success
-    pretty_log(
-        "ready",
-        f"{interaction.user} updated their channel successfully.",
-    )
+    pretty_log("ready", f"{interaction.user} updated their channel successfully.")
