@@ -16,7 +16,38 @@ from utils.logs.pretty_log import pretty_log
     date_joined BIGINT
 );
 """
-
+async def get_registered_personal_channel(bot: discord.Client, user_id: int):
+    """Fetch the registered personal channel ID for a given user ID."""
+    try:
+        async with bot.pg_pool.acquire() as conn:
+            row = await conn.fetchrow(
+                """
+                SELECT channel_id
+                FROM celestial_members
+                WHERE user_id = $1
+                """,
+                user_id,
+            )
+            if row:
+                channel_id = row["channel_id"]
+                pretty_log(
+                    message=f"✅ Fetched registered personal channel for user ID: {user_id}, Channel ID: {channel_id}",
+                    tag="db",
+                )
+                return channel_id
+            else:
+                pretty_log(
+                    message=f"⚠️ Celestial member with ID {user_id} not found when fetching registered personal channel.",
+                    tag="db",
+                )
+                return None
+    except Exception as e:
+        pretty_log(
+            message=f"❌ Failed to fetch registered personal channel for user ID: {user_id}: {e}",
+            tag="error",
+            include_trace=True,
+        )
+        return None
 async def fetch_clan_treasury_donation(bot: discord.Client, user_id: int):
     """Fetch the clan treasury donation amount for a given celestial member."""
     try:
@@ -177,7 +208,7 @@ async def fetch_all_celestial_member_ids(bot: discord.Client):
             include_trace=True,
         )
         return [], str(e)
-    
+
 async def fetch_celestial_member(bot: discord.Client, user_id: int):
     """Fetch a single celestial member by user ID."""
     try:

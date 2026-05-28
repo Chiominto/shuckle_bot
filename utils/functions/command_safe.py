@@ -1,7 +1,9 @@
+import traceback
+
 import discord
 from discord.ext import commands
+
 from utils.logs.pretty_log import pretty_log
-import traceback
 
 
 async def run_command_safe(
@@ -37,10 +39,21 @@ async def run_command_safe(
             f"❌ Error in /{slash_cmd_name}{target}: {e}\nTraceback:\n{tb_str}",
         )
         try:
-            await interaction.followup.send(
-                "⚠️ Something went wrong. Please contact Khy.",
-                ephemeral=True,
-            )
+            if interaction.response.is_done():
+                await interaction.followup.send(
+                    "⚠️ Something went wrong. Please contact Khy.",
+                    ephemeral=True,
+                )
+            else:
+                await interaction.response.send_message(
+                    "⚠️ Something went wrong. Please contact Khy.",
+                    ephemeral=True,
+                )
+        except discord.NotFound:
+            if interaction.channel:
+                await interaction.channel.send(
+                    f"{interaction.user.mention} ⚠️ Something went wrong. Please contact Khy."
+                )
         except Exception as send_exc:
             pretty_log(
                 tag="warn",
@@ -67,5 +80,5 @@ async def safe_send_modal(interaction: discord.Interaction, modal: discord.ui.Mo
         except Exception as send_exc:
             pretty_log(
                 tag="warn",
-               message= f"⚠️ Failed to notify {interaction.user} about modal failure: {send_exc}",
+                message=f"⚠️ Failed to notify {interaction.user} about modal failure: {send_exc}",
             )

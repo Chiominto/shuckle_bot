@@ -14,6 +14,10 @@ TEMP_ROLE_IDS = [
     CELESTIAL_ROLES.coin_saver,
     CELESTIAL_ROLES.tip_jar_titan,
     CELESTIAL_ROLES.top_catcher,
+    CELESTIAL_ROLES.golden_fry_disciple,
+    CELESTIAL_ROLES.supernova,
+    CELESTIAL_ROLES.nebula,
+    CELESTIAL_ROLES.comet,
 ]
 
 
