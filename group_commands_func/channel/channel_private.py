@@ -3,12 +3,14 @@ from datetime import datetime
 import discord
 from discord.ext import commands
 
+from constants.celestial_constants import CELESTIAL_ROLES
+from constants.permissions import MEMBER_PERMISSIONS
 from utils.db.celestial_members_db import get_registered_personal_channel
 from utils.functions.design_embed import design_embed
 from utils.functions.pretty_defer import pretty_defer
 from utils.functions.webhook_func import send_server_log
 from utils.logs.pretty_log import pretty_log
-from constants.celestial_constants import CELESTIAL_ROLES
+
 
 # Channel Private Function
 async def channel_private_func(bot: commands.Bot, interaction: discord.Interaction):
@@ -67,6 +69,10 @@ async def channel_private_func(bot: commands.Bot, interaction: discord.Interacti
 
     try:
         await channel.set_permissions(clan_member_role, overwrite=None)
+        await channel.set_permissions(
+            user,
+            overwrite=discord.PermissionOverwrite(**MEMBER_PERMISSIONS),
+        )
 
         embed = discord.Embed(
             title="Channel Made Private",
