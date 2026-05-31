@@ -119,7 +119,7 @@ async def setup_schedulers(bot):
         monthly_stats_reminder = scheduler_manager.add_cron_job(
             send_monthly_stats_reminder,
             name="monthly_stats_reminder",
-            day="last",
+            day_of_month="last",
             hour=23,
             minute=50,
             timezone=NYC,
