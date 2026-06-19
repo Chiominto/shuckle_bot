@@ -127,13 +127,12 @@ async def process_clan_kick_message(bot: discord.Client, message: discord.Messag
     if not replied_message:
         pretty_log(
             "warn",
-            f"Kick message ID {message.id} has no replied message to reference.",
+            f"Kick message ID {message.id} has no replied message to reference. Falling back to kick message itself (slash command).",
             label="Clan Kick",
         )
-        return
 
     await auto_clan_remove_func(
-        bot=bot, member=member, message=replied_message, context="clan_kick"
+        bot=bot, member=member, message=replied_message or message, context="clan_kick"
     )
 
 
@@ -177,7 +176,6 @@ async def auto_clan_remove_func(
 
         # 🪄 Role references
         clan_member_role = guild.get_role(CELESTIAL_ROLES.celestialnova_)
-
 
         # 🧠 Log: Role check
         pretty_log(
