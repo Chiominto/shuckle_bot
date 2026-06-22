@@ -51,11 +51,16 @@ async def send_code_claim_to_rs(
     try:
         member = await get_pokemeow_reply_member(message=message)
         if not member:
-            pretty_log(
-                "warn",
-                f"Skipping code-claim rare-spawn post: could not resolve replied member for message ID {message.id}",
-            )
-            return
+            # Slash command fallback: PokéMeow response has no reply reference,
+            # but message.interaction carries the user who used the command.
+            if message.interaction and message.guild:
+                member = message.guild.get_member(message.interaction.user.id)
+            if not member:
+                pretty_log(
+                    "warn",
+                    f"Skipping code-claim rare-spawn post: could not resolve member for message ID {message.id}",
+                )
+                return
 
         guild = member.guild
 
@@ -70,7 +75,11 @@ async def send_code_claim_to_rs(
         content = (
             message.content if isinstance(message, discord.Message) else str(message)
         )
-        raw_pokemon_name = re.search(r"\*\*(.*?)\*\*", content)
+        # Primary: bold text e.g. "**Shiny Miraidon**" (prefix command response)
+        # Fallback: text after emojis before "!" e.g. "🎁 🦎 Shiny Miraidon!" (slash command response)
+        raw_pokemon_name = re.search(r"\*\*(.*?)\*\*", content) or re.search(
+            r"(?:(?:<:[^>]+>|[^\w\s]) )+([A-Za-z][\w\s]*?)!", content
+        )
         if not raw_pokemon_name:
             pretty_log(
                 "critical",
