@@ -5,7 +5,7 @@ import discord
 from discord.ext import commands
 
 from constants.aesthetics import Thumbnails
-from constants.celestial_constants import CELESTIAL_TEXT_CHANNELS, CELESTIAL_SERVER_ID
+from constants.celestial_constants import CELESTIAL_SERVER_ID, CELESTIAL_TEXT_CHANNELS
 from utils.db.boosted_channels import (
     get_channel_booster_id,
     is_channel_boosted,
@@ -31,16 +31,16 @@ async def contact_booster_to_remove_boost(
     if not ex_member_channel_booster_id:
         pretty_log(
             "info",
-            f"No booster found for channel {channel_id} during clan removal of {member.display_name}.",
+            f"No booster found for channel {channel_id} during clan removal of {member.display_name if member else channel_name or channel_id}.",
         )
         return
-    if ex_member_channel_booster_id == member.id:
+    if member and ex_member_channel_booster_id == member.id:
         return  # Booster is the member themselves, no need to contact
     booster_member = guild.get_member(ex_member_channel_booster_id)
     if not booster_member:
         pretty_log(
             "info",
-            f"Booster member {ex_member_channel_booster_id} not found in guild during clan removal of {member.display_name}.",
+            f"Booster member {ex_member_channel_booster_id} not found in guild during clan removal of {member.display_name if member else channel_name or channel_id}.",
         )
         return
 
@@ -68,7 +68,11 @@ async def contact_booster_to_remove_boost(
     value_str = f";channel remove_boost {channel_id}"
     embed.add_field(name="Channel Boost Remove Command", value=value_str, inline=False)
     embed = design_embed(
-        embed=embed, thumbnail_url=member.display_avatar.url, user=booster_member
+        embed=embed,
+        thumbnail_url=(
+            member.display_avatar.url if member else booster_member.display_avatar.url
+        ),
+        user=booster_member,
     )
     # Get booster member personal channel
     booster_member_channel_id = await fetch_clan_channel_id(bot, booster_member.id)
@@ -81,7 +85,7 @@ async def contact_booster_to_remove_boost(
     if not booster_member_channel:
         pretty_log(
             "info",
-            f"Booster member channel {booster_channel_id} not found during clan removal of {member.display_name}.",
+            f"Booster member channel {booster_channel_id} not found during clan removal of {member.display_name if member else channel_name or channel_id}.",
         )
         return
 
@@ -93,7 +97,7 @@ async def contact_booster_to_remove_boost(
     await booster_member_channel.send(embed=embed, content=content)
     pretty_log(
         "info",
-        f"Notified booster {booster_member.display_name} about clan removal of {member.display_name}.",
+        f"Notified booster {booster_member.display_name} about clan removal of {member.display_name if member else channel_name or channel_id}.",
     )
 
 
