@@ -126,7 +126,7 @@ async def process_clan_kick_message(bot: discord.Client, message: discord.Messag
     replied_message = message.reference.resolved if message.reference else None
     if not replied_message:
         pretty_log(
-            "warn",
+            "info",
             f"Kick message ID {message.id} has no replied message to reference. Falling back to kick message itself (slash command).",
             label="Clan Kick",
         )
@@ -238,7 +238,10 @@ async def auto_clan_remove_func(
                     member=member,
                     channel_name=member_channel_name,
                 )
-                await process_message.edit(content="", embed=embed)
+                try:
+                    await process_message.edit(content="", embed=embed)
+                except discord.NotFound:
+                    pass  # Channel was deleted during removal — nothing to edit
 
         pretty_log(
             tag="success",
