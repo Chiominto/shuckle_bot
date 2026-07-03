@@ -250,7 +250,7 @@ async def remove_boosted_channel_listener(bot, message: discord.Message):
         unboosted_channel = guild.get_channel(unboosted_channel_id)
         if not unboosted_channel:
             pretty_log(
-                "warn",
+                "info",
                 f"Unboosted channel {unboosted_channel_id} not found in guild {guild.name} ({guild.id}).",
             )
             return
