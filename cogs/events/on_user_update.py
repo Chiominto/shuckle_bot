@@ -10,6 +10,7 @@ from constants.celestial_constants import (
 )
 from utils.cache.cache_list import celestial_members_cache
 from utils.db.general_db import update_username_in_dbs
+from utils.functions.channel_rename import auto_channel_rename
 from utils.functions.webhook_func import send_webhook
 from utils.logs.pretty_log import pretty_log
 
@@ -34,19 +35,12 @@ class OnUserUpdateCog(commands.Cog):
             return
 
         try:
-            # Find a mutual guild to log in
-            member = None
-            guild = None
-            for g in self.bot.guilds:
-                m = g.get_member(after.id)
-                if m:
-                    member = m
-                    guild = g
-                    break
-
-            if not member or not guild:
-                return
             guild = self.bot.get_guild(CELESTIAL_SERVER_ID)
+            if not guild:
+                return
+            member = guild.get_member(after.id)
+            if not member:
+                return
             log_channel = guild.get_channel(CELESTIAL_TEXT_CHANNELS.server_logs)
             if not log_channel:
                 pretty_log(
@@ -82,6 +76,7 @@ class OnUserUpdateCog(commands.Cog):
             await send_webhook(self.bot, log_channel, embed=embed)
             if clan_member:
                 await update_username_in_dbs(self.bot, after.id, after.name)
+                await auto_channel_rename(self.bot, after.name, member)
 
             pretty_log(
                 tag="info",
