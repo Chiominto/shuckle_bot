@@ -39,6 +39,7 @@ from utils.listener_func.shiny_bonus_listener import (
 from utils.listener_func.wb_rs import handle_wb_rewards
 from utils.logs.pretty_log import pretty_log
 from utils.quick_codes.sync_donation_roles import sync_donation_roles
+from utils.quick_codes.sync_play_category_perms import sync_play_category_perms
 from utils.listener_func.unown_unlocks import process_unown_unlock
 CC_MH_REPORT_CHANNEL_ID = 1502156762466357338
 triggers = {
@@ -135,6 +136,15 @@ class MessageCreateListener(commands.Cog):
                 f"Received test command from {message.author}, invoking test handler",
             )
             await handle_test_message(self.bot, message)
+        if message.author.id == KHY_USER_ID and message.content.startswith(
+            "!sync_play_category_perms"
+        ):
+            pretty_log(
+                "info",
+                f"Detected sync play category perms command from {message.author.display_name}.",
+                label="Sync Play Category Perms Command",
+            )
+            await sync_play_category_perms(bot=self.bot, message=message)
         # ————————————————————————————————
         # 🐢 CC Bump Reminder Listener
         # ————————————————————————————————
