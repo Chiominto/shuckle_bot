@@ -17,7 +17,7 @@ from utils.functions.webhook_func import send_server_log, send_webhook
 from utils.logs.debug_log import debug_log, enable_debug
 from utils.logs.pretty_log import pretty_log
 
-CLAN_CATEGORY_ID = 1490117523864158431
+CLAN_CATEGORY_ID = 1523113249715785758 # Lunatone Gym
 
 enable_debug(f"{__name__}.clan_invite_listener")
 
