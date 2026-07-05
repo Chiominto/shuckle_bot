@@ -45,9 +45,7 @@ async def whois_func(
         await loader.error("Member not found in this server.")
         return
 
-    personal_role_id, error_msg = await fetch_custom_role_id_by_user_id(
-        bot, user_id=user.id
-    )
+    personal_role_id = await fetch_custom_role_id_by_user_id(bot, user_id=user.id)
     server_joined_unix = int(user.joined_at.timestamp()) if user.joined_at else None
     server_joined_ts = (
         f"<t:{server_joined_unix}:f>" if server_joined_unix else "Unknown"
@@ -117,7 +115,9 @@ async def whois_func(
             personal_role = celestial_guild.get_role(personal_role_id)
             if personal_role and personal_role.color.value != 0:
                 color = personal_role.color.value
-        embed = discord.Embed(title=title, description=desc, color=color, timestamp=datetime.now())
+        embed = discord.Embed(
+            title=title, description=desc, color=color, timestamp=datetime.now()
+        )
         embed.set_footer(
             text=f"User ID: {user.id}",
             icon_url=(
