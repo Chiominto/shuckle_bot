@@ -296,6 +296,11 @@ async def auto_clan_remove_handler(
             CELESTIAL_ROLES.shiny_bonus,
             CELESTIAL_ROLES.giveaways,
             CELESTIAL_ROLES.battle_tower,
+            CELESTIAL_ROLES.wish_badge,
+            CELESTIAL_ROLES.solar_badge,
+            CELESTIAL_ROLES.crescent_badge,
+            CELESTIAL_ROLES.dream_badge,
+            CELESTIAL_ROLES.prism_badge,
         )
 
         # 🐾 Unpack roles

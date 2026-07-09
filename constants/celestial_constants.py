@@ -113,6 +113,11 @@ class CELESTIAL_CATEGORIES:
 #       CELESTIAL_ROLES
 # 💦☁────────────────────────────────────────────💦☁
 class CELESTIAL_ROLES:
+    prism_badge = 1523990691879981086
+    dream_badge = 1523990548770197524
+    wish_badge = 1523990366284419092
+    solar_badge = 1523990268540485738
+    crescent_badge = 1523989929460498504
     cosmic_catch_goal = 1505715488469024970
     info_divider = 1500685625849024696
     ping_divider = 1500685544902885447

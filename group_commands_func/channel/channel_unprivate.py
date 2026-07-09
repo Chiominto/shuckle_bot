@@ -59,10 +59,7 @@ async def channel_unprivate_func(bot: commands.Bot, interaction: discord.Interac
     clan_member_overwrite = channel.overwrites_for(clan_member_role)
 
     # Check if Clan member role already has access (channel is not private)
-    if (
-        not clan_member_overwrite.is_empty()
-        or clan_member_overwrite.view_channel is not False
-    ):
+    if not clan_member_overwrite.is_empty():
         msg = "🔓 Your channel is already unprivate! Clan members can see it."
         await handler.error(content=msg)
         pretty_log(
