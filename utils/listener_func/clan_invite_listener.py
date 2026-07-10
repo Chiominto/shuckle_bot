@@ -145,6 +145,7 @@ async def clan_invite_listener(bot: discord.Client, message: discord.Message):
 
     # Add roles to member
     clan_member_role = guild.get_role(CELESTIAL_ROLES.celestialnova_)
+    crescent_badge_role = guild.get_role(CELESTIAL_ROLES.crescent_badge)
     coin_saver_role = guild.get_role(CELESTIAL_ROLES.coin_saver)
     npc_role = guild.get_role(CELESTIAL_ROLES.npc)
     former_member_role = guild.get_role(CELESTIAL_ROLES.former_clan_member)
@@ -153,7 +154,7 @@ async def clan_invite_listener(bot: discord.Client, message: discord.Message):
         debug_log(
             f"Attempting to add roles to {member.name}. Clan role ID: {clan_member_role.id if clan_member_role else 'None'}, Coin saver role ID: {coin_saver_role.id if coin_saver_role else 'None'}"
         )
-        await member.add_roles(clan_member_role, coin_saver_role)
+        await member.add_roles(clan_member_role, coin_saver_role, crescent_badge_role)
         debug_log(f"Added roles to {member.name} successfully.")
         if npc_role and adventurer_role:
             # Remove both roles from member if they have them cuz its guest roles
@@ -166,7 +167,7 @@ async def clan_invite_listener(bot: discord.Client, message: discord.Message):
             if former_member_role and former_member_role in member.roles:
                 await member.remove_roles(former_member_role)
                 debug_log(f"Removed former clan member role from {member.name}")
-                
+
 
     except Exception as e:
         debug_log(f"Error adding roles to {member.name}: {e}")
