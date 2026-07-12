@@ -4,11 +4,14 @@ import discord
 from discord.ext import commands
 
 from constants.celestial_constants import CELESTIAL_ROLES, CELESTIAL_TEXT_CHANNELS
+from utils.db.celestial_members_db import (
+    fetch_celestial_member,
+    remove_celestial_member,
+)
 from utils.db.temp_roles_db import delete_temp_role
-from utils.functions.webhook_func import send_server_log
-from utils.logs.pretty_log import pretty_log
 from utils.functions.server_booster_handler import handle_server_booster_role_remove
-from utils.functions.webhook_func import send_webhook
+from utils.functions.webhook_func import send_server_log, send_webhook
+from utils.logs.pretty_log import pretty_log
 
 TEMP_ROLE_IDS = [
     CELESTIAL_ROLES.coin_saver,
@@ -48,6 +51,25 @@ async def handle_role_remove(
     # ————————————————————————————————
     if role_id == CELESTIAL_ROLES.server_booster:
         await handle_server_booster_role_remove(bot, member)
+
+    # ————————————————————————————————
+    # 🩵 Celestial Member Role Remove
+    # ————————————————————————————————
+    if role_id == CELESTIAL_ROLES.celestialnova_:
+        # Check if the member is in the database
+        celestial_member = await fetch_celestial_member(bot, member.id)
+        if celestial_member:
+            error = await remove_celestial_member(bot, member.id)
+            if error:
+                pretty_log(
+                    "error",
+                    f"Failed to remove celestial member {member.name} ({member.id}) from database: {error}",
+                )
+            else:
+                pretty_log(
+                    "info",
+                    f"Removed Celestial nova role from {member.name} ({member.id}) and deleted from database.",
+                )
 
     # ————————————————————————————————
     # 🩵 Role Removal Logging

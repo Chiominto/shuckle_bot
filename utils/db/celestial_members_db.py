@@ -16,6 +16,8 @@ from utils.logs.pretty_log import pretty_log
     date_joined BIGINT
 );
 """
+
+
 async def get_registered_personal_channel(bot: discord.Client, user_id: int):
     """Fetch the registered personal channel ID for a given user ID."""
     try:
@@ -48,6 +50,8 @@ async def get_registered_personal_channel(bot: discord.Client, user_id: int):
             include_trace=True,
         )
         return None
+
+
 async def fetch_clan_treasury_donation(bot: discord.Client, user_id: int):
     """Fetch the clan treasury donation amount for a given celestial member."""
     try:
@@ -81,6 +85,7 @@ async def fetch_clan_treasury_donation(bot: discord.Client, user_id: int):
         )
         return None
 
+
 async def fetch_clan_bank_donation(bot: discord.Client, user_id: int):
     """Fetch the clan bank donation amount for a given celestial member."""
     try:
@@ -113,6 +118,7 @@ async def fetch_clan_bank_donation(bot: discord.Client, user_id: int):
             include_trace=True,
         )
         return None
+
 
 async def fetch_donation_record(bot: discord.Client, user_id: int):
     """Fetch the donation record (clan bank and clan treasury donations) for a given celestial member."""
@@ -149,16 +155,16 @@ async def fetch_donation_record(bot: discord.Client, user_id: int):
             include_trace=True,
         )
         return None
+
+
 async def fetch_all_celestial_members(bot: discord.Client):
     """Fetch all celestial members from the database."""
     try:
         async with bot.pg_pool.acquire() as conn:
-            rows = await conn.fetch(
-                """
+            rows = await conn.fetch("""
                 SELECT user_id, user_name, pokemeow_name, channel_id, actual_perks, clan_bank_donation, clan_treasury_donation, date_joined
                 FROM celestial_members
-                """
-            )
+                """)
             members = [
                 {
                     "user_id": row["user_id"],
@@ -185,16 +191,15 @@ async def fetch_all_celestial_members(bot: discord.Client):
         )
         return [], str(e)
 
+
 async def fetch_all_celestial_member_ids(bot: discord.Client):
     """Fetch all celestial member IDs from the database."""
     try:
         async with bot.pg_pool.acquire() as conn:
-            rows = await conn.fetch(
-                """
+            rows = await conn.fetch("""
                 SELECT user_id
                 FROM celestial_members
-                """
-            )
+                """)
             member_ids = [row["user_id"] for row in rows]
             pretty_log(
                 message=f"✅ Fetched {len(member_ids)} celestial member IDs from the database.",
@@ -208,6 +213,7 @@ async def fetch_all_celestial_member_ids(bot: discord.Client):
             include_trace=True,
         )
         return [], str(e)
+
 
 async def fetch_celestial_member(bot: discord.Client, user_id: int):
     """Fetch a single celestial member by user ID."""
@@ -570,17 +576,6 @@ async def remove_celestial_member(
             remove_celestial_member_cache(user_id)
 
             return None
-    except Exception as e:
-        pretty_log(
-            message=f"❌ Failed to remove celestial member ID: {user_id} from the database: {e}",
-            tag="error",
-            include_trace=True,
-        )
-        error_message = (
-            f"Failed to remove celestial member ID: {user_id} from the database: {e}"
-        )
-        return error_message
-
     except Exception as e:
         pretty_log(
             message=f"❌ Failed to remove celestial member ID: {user_id} from the database: {e}",
