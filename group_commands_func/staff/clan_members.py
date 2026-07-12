@@ -5,7 +5,7 @@ from discord.ext import commands
 from discord.ui import Button, View
 
 from constants.aesthetics import *
-from constants.celestial_constants import DEFAULT_EMBED_COLOR, CELESTIAL_SERVER_ID
+from constants.celestial_constants import CELESTIAL_SERVER_ID, DEFAULT_EMBED_COLOR
 from utils.db.celestial_members_db import fetch_all_celestial_members
 from utils.functions.pretty_defer import pretty_defer
 from utils.logs.pretty_log import pretty_log
@@ -132,9 +132,11 @@ async def clan_members_func(
 
     # Fetch all Clan members from the database
     try:
-        members = await fetch_all_celestial_members(bot)
-        if not members:
-            await loader.error(content="No Celestial Clan members found in the database.")
+        members, error = await fetch_all_celestial_members(bot)
+        if error or not members:
+            await loader.error(
+                content="No Celestial Clan members found in the database."
+            )
             return
 
         # Sort members by clan_joined_date (oldest first, unknowns last)
