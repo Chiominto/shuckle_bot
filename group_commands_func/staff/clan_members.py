@@ -82,7 +82,7 @@ class Clan_Members_Paginator(View):
             perks = member.get("actual_perks") or "N/A"
             channel_id = member.get("channel_id")
             channel_mention = f"<#{channel_id}>" if channel_id else "No channel set"
-            clan_joined_date = member.get("clan_joined_date", "Unknown")
+            clan_joined_date = member.get("date_joined", "Unknown")
             joined_date_str = "N/A"
             if clan_joined_date:
                 joined_date_str = f"<t:{clan_joined_date}:D>"
@@ -141,7 +141,7 @@ async def clan_members_func(
 
         # Sort members by clan_joined_date (oldest first, unknowns last)
         def get_joined_date(member):
-            date = member.get("clan_joined_date")
+            date = member.get("date_joined")
             try:
                 return int(date)
             except (TypeError, ValueError):
