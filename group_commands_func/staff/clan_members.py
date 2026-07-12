@@ -6,7 +6,10 @@ from discord.ui import Button, View
 
 from constants.aesthetics import *
 from constants.celestial_constants import CELESTIAL_SERVER_ID, DEFAULT_EMBED_COLOR
-from utils.db.celestial_members_db import fetch_all_celestial_members
+from utils.db.celestial_members_db import (
+    fetch_all_celestial_members,
+    remove_celestial_member,
+)
 from utils.functions.pretty_defer import pretty_defer
 from utils.logs.pretty_log import pretty_log
 
@@ -75,8 +78,6 @@ class Clan_Members_Paginator(View):
         for member in page_members:
             member_id = member.get("user_id")
             discord_member = guild.get_member(member_id)
-            if not discord_member:
-                continue
             member_name = member.get("user_name", "Unknown")
             pokemeow_name = member.get("pokemeow_name", "Unknown")
             perks = member.get("actual_perks") or "N/A"
@@ -148,6 +149,22 @@ async def clan_members_func(
                 return float("inf")  # Put unknown dates at the end
 
         members.sort(key=get_joined_date)
+
+        # Remove members who have left the server from the database
+        guild: discord.Guild = bot.get_guild(CELESTIAL_SERVER_ID)
+        active_members = []
+        for member in members:
+            member_id = member.get("user_id")
+            if guild and not guild.get_member(member_id):
+                pretty_log(
+                    message=f"Member {member_id} not found in guild, removing from database.",
+                    tag="info",
+                )
+                await remove_celestial_member(bot, member_id)
+            else:
+                active_members.append(member)
+        members = active_members
+
         # Create and send the paginator
         paginator = Clan_Members_Paginator(bot, user, members, per_page=10)
         embed = await paginator.get_embed()
