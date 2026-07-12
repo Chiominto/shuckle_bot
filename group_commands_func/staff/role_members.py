@@ -94,14 +94,14 @@ class RoleMembersView(discord.ui.View):
     class PrevButton(discord.ui.Button):
         def __init__(self, parent: "RoleMembersView"):
             super().__init__(emoji="⬅️", style=discord.ButtonStyle.primary)
-            self.parent = parent
+            self._view = parent
 
         async def callback(self, interaction: discord.Interaction):
             try:
-                self.parent.page -= 1
-                self.parent.update_buttons()
-                await self.parent.message.edit(
-                    embed=self.parent.format_page(), view=self.parent
+                self._view.page -= 1
+                self._view.update_buttons()
+                await self._view.message.edit(
+                    embed=self._view.format_page(), view=self._view
                 )
                 await interaction.response.defer()
             except Exception as e:
@@ -113,14 +113,14 @@ class RoleMembersView(discord.ui.View):
     class NextButton(discord.ui.Button):
         def __init__(self, parent: "RoleMembersView"):
             super().__init__(emoji="➡️", style=discord.ButtonStyle.primary)
-            self.parent = parent
+            self._view = parent
 
         async def callback(self, interaction: discord.Interaction):
             try:
-                self.parent.page += 1
-                self.parent.update_buttons()
-                await self.parent.message.edit(
-                    embed=self.parent.format_page(), view=self.parent
+                self._view.page += 1
+                self._view.update_buttons()
+                await self._view.message.edit(
+                    embed=self._view.format_page(), view=self._view
                 )
                 await interaction.response.defer()
             except Exception as e:

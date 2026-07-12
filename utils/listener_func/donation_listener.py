@@ -19,6 +19,7 @@ from utils.db.celestial_members_db import (
     fetch_donation_record,
     update_clan_bank_donation,
     update_clan_treasury_donation,
+    upsert_celestial_member_id_and_name_only,
 )
 from utils.functions.design_embed import design_embed
 from utils.functions.pokemeow_reply import get_pokemeow_reply_member
@@ -197,6 +198,10 @@ async def process_donation(
     new_total = 0
     # Fetch donation record
     donation_record = await fetch_donation_record(bot, member.id)
+    if donation_record is None:
+        await upsert_celestial_member_id_and_name_only(
+            bot, member.id, member.display_name
+        )
     clan_treasury_donations = (
         donation_record["clan_treasury_donation"] if donation_record else 0
     )
