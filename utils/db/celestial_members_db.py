@@ -485,7 +485,7 @@ async def update_clan_bank_donation(
             await conn.execute(
                 """
                 UPDATE celestial_members
-                SET clan_bank_donation = clan_bank_donation + $1
+                SET clan_bank_donation = $1
                 WHERE user_id = $2
                 """,
                 donation_amount,
@@ -523,7 +523,7 @@ async def update_clan_treasury_donation(
             await conn.execute(
                 """
                 UPDATE celestial_members
-                SET clan_treasury_donation = clan_treasury_donation + $1
+                SET clan_treasury_donation = $1
                 WHERE user_id = $2
                 """,
                 donation_amount,
