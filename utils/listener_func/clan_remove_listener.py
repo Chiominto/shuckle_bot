@@ -137,9 +137,21 @@ async def process_clan_kick_message(bot: discord.Client, message: discord.Messag
 
 
 # ──────────────────────────────────────────────
+CLAN_REMOVE_WHITELIST: set[int] = {
+    1491079044769513544,
+}
+
+
 async def auto_clan_remove_func(
     bot: discord.Client, member: discord.Member, message: discord.Message, context: str
 ):
+    if member.id in CLAN_REMOVE_WHITELIST:
+        pretty_log(
+            tag="info",
+            message=f"⛔ Skipping clan removal for whitelisted user {member.display_name} ({member.id}).",
+            label="🛟 Clan Remove",
+        )
+        return
 
     guild = bot.get_guild(CELESTIAL_SERVER_ID)
     if guild is None:
