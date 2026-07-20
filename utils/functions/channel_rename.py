@@ -34,9 +34,12 @@ async def auto_channel_rename(
             return
         # Fetch old channel name before renaming
         old_name = clan_channel.name
-        # Extract just the username part (e.g. "🧸 · _qntn_" -> "_qntn_")
-        # and preserve the prefix (emoji + " · ") for the rename
-        if " · " in old_name:
+        # Extract just the username part and preserve the emoji prefix for the rename.
+        # Supports both "🌌・name" (katakana middle dot) and "🌌 · name" (spaced middle dot).
+        if "・" in old_name:
+            prefix, _ = old_name.split("・", 1)
+            full_new_name = f"{prefix}・{new_name}"
+        elif " · " in old_name:
             prefix, _ = old_name.split(" · ", 1)
             full_new_name = f"{prefix} · {new_name}"
         else:
