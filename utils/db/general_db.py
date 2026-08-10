@@ -1,4 +1,5 @@
 import discord
+
 from utils.logs.pretty_log import pretty_log
 
 TABLE_NAMES = [
@@ -15,24 +16,24 @@ TABLE_NAMES = [
 
 
 async def update_username_in_dbs(bot: discord.Client, user_id: int, new_username: str):
-    try:
-        async with bot.pg_pool.acquire() as conn:
-            for table in TABLE_NAMES:
+    async with bot.pg_pool.acquire() as conn:
+        for table in TABLE_NAMES:
+            try:
                 await conn.execute(
                     f"UPDATE {table} SET user_name = $1 WHERE user_id = $2;",
                     new_username,
                     user_id,
                 )
-        pretty_log(
-            tag="info",
-            message=f"Updated username for user {user_id} to '{new_username}' in all relevant database tables",
-        )
-    except Exception as e:
-        pretty_log(
-            tag="error",
-            message=f"Failed to update username for user {user_id} in databases: {e}",
-            include_trace=True,
-        )
+            except Exception as e:
+                pretty_log(
+                    tag="error",
+                    message=f"Failed to update username for user {user_id} in table '{table}': {e}",
+                    include_trace=True,
+                )
+    pretty_log(
+        tag="info",
+        message=f"Updated username for user {user_id} to '{new_username}' in all relevant database tables",
+    )
 
 
 async def remove_user_from_dbs(bot: discord.Client, user_id: int):

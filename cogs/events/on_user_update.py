@@ -76,6 +76,7 @@ class OnUserUpdateCog(commands.Cog):
             await send_webhook(self.bot, log_channel, embed=embed)
             if clan_member:
                 await update_username_in_dbs(self.bot, after.id, after.name)
+                celestial_members_cache[after.id]["user_name"] = after.name
                 await auto_channel_rename(self.bot, after.name, member)
 
             pretty_log(
