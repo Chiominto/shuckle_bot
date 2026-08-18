@@ -113,6 +113,7 @@ class CELESTIAL_CATEGORIES:
 #       CELESTIAL_ROLES
 # 💦☁────────────────────────────────────────────💦☁
 class CELESTIAL_ROLES:
+    snipe_giveaways = 1539220238657134654
     prism_badge = 1523990691879981086
     dream_badge = 1523990548770197524
     wish_badge = 1523990366284419092

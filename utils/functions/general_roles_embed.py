@@ -149,6 +149,7 @@ def build_general_roles_embed(guild: discord.Guild, user: discord.Member):
 
         # Server Roles
         giveaway_role = guild.get_role(CELESTIAL_ROLES.giveaways)
+        snipe_giveaway_role = guild.get_role(CELESTIAL_ROLES.snipe_giveaways)
         golden_hour_role = guild.get_role(CELESTIAL_ROLES.golden_waters)
         trade_ads_role = guild.get_role(CELESTIAL_ROLES.trade_ads)
         ee_spawn_ping = guild.get_role(CELESTIAL_ROLES.ee_ping)
@@ -169,7 +170,15 @@ def build_general_roles_embed(guild: discord.Guild, user: discord.Member):
                 ToggleRoleButton(role=giveaway_role, label="Giveaways", emoji=emoji)
             )
             roles.append((emoji, giveaway_role))
-
+        if snipe_giveaway_role and clan_member_role in user.roles:
+            emoji = "🎉"
+            view.add_item(
+                ToggleRoleButton(
+                    role=snipe_giveaway_role, label="Snipe Giveaways", emoji=emoji
+                )
+            )
+            roles.append((emoji, snipe_giveaway_role))
+            
         if golden_hour_role:
             emoji = "🐟"
             view.add_item(
