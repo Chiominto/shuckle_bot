@@ -141,7 +141,7 @@ class UploadRoleIconView(discord.ui.View):
                 attachment.filename.lower().endswith(ext) for ext in ALLOWED_EXTENSIONS
             ):
                 pretty_log(
-                    "error",
+                    "info",
                     f"❌ Invalid file type: {attachment.filename}",
                 )
                 return await interaction.followup.send(
