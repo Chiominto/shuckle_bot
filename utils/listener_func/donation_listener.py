@@ -4,23 +4,15 @@ from datetime import datetime
 import discord
 
 from constants.aesthetics import Thumbnails
-from constants.celestial_constants import (
-    CELESTIAL_BANK_USER_ID,
-    CELESTIAL_EMOJIS,
-    CELESTIAL_ROLES,
-    CELESTIAL_SERVER_ID,
-    CELESTIAL_TEXT_CHANNELS,
-    DEFAULT_EMBED_COLOR,
-    KHY_USER_ID,
-)
+from constants.celestial_constants import (CELESTIAL_BANK_USER_ID,
+                                           CELESTIAL_EMOJIS, CELESTIAL_ROLES,
+                                           CELESTIAL_SERVER_ID,
+                                           CELESTIAL_TEXT_CHANNELS,
+                                           DEFAULT_EMBED_COLOR, KHY_USER_ID)
 from utils.db.celestial_members_db import (
-    fetch_clan_bank_donation,
-    fetch_clan_treasury_donation,
-    fetch_donation_record,
-    update_clan_bank_donation,
-    update_clan_treasury_donation,
-    upsert_celestial_member_id_and_name_only,
-)
+    fetch_clan_bank_donation, fetch_clan_treasury_donation,
+    fetch_donation_record, update_clan_bank_donation,
+    update_clan_treasury_donation, upsert_celestial_member_id_and_name_only)
 from utils.functions.design_embed import design_embed
 from utils.functions.pokemeow_reply import get_pokemeow_reply_member
 from utils.functions.pokemon_func import format_price_w_coin
@@ -38,10 +30,11 @@ MIN_DONATION_AMOUNT = ACTUAL_AMOUNT
 def extract_pokecoins_amount_from_donate(text: str) -> int:
     """
     Extracts the donated PokeCoins amount from a message like:
-    'You successfully donated <...> **50,000** to ...'
+    'You donated <:PokeCoin:...> 100,000 to Celestial!'
+    (amount may or may not be wrapped in **bold** markdown)
     """
     match = re.search(
-        r"donated.*?\*\*(?P<amount>[\d,]+)\*\*",
+        r"donated.*?(?:\*\*)?(?P<amount>[\d,]+)(?:\*\*)?\s*(?:to|<)",
         text,
         re.IGNORECASE,
     )
