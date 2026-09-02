@@ -206,7 +206,7 @@ class MessageCreateListener(commands.Cog):
         # 🐢 Clan Invite Handler
         # ————————————————————————————————
         if (
-            ":tada: Welcome," in message.content
+            "Welcome," in message.content
             and "You have successfully joined" in message.content
             and "Celestial" in message.content
         ):
