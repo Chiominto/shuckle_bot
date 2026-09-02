@@ -306,7 +306,7 @@ class MessageCreateListener(commands.Cog):
         # ————————————————————————————————
         # 🐢 Clan Donations
         # ————————————————————————————————
-        if content and "You successfully donated" in content and "Celestial" in content:
+        if content and "You donated" in content and "Celestial" in content:
             pretty_log(
                 "info",
                 f"Detected clan donation message: {content}",
