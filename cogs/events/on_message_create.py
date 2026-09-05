@@ -51,7 +51,7 @@ triggers = {
     "wb_spawn": "spawned a world boss using 1x <:boss_coin:1249165805095092356>",
     "wb_command": "a world boss has spawned! register now!",
     "ee_vote_checker": "there is no active world boss",
-    "code_use": "<:checkedbox:752302633141665812> you used a code to claim a :gift:",
+    "code_use": "<:checkedbox:752302633141665812> you used a code to claim a 🎁",
     "golden_stone": "to claim your <:golden_",
     "battle_frontier_ach": "🎖️ you may continue your",
     "incense_command": "Incense charges are shared & used by every player in this server",
