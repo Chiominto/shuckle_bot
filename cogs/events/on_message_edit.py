@@ -4,14 +4,16 @@ import discord
 from discord.ext import commands
 
 from constants.celestial_constants import CC_SERVER_ID, POKEMEOW_APPLICATION_ID
+from utils.listener_func.clan_remove_listener import (
+    process_clan_kick_message, process_clan_leave_command)
 from utils.logs.pretty_log import pretty_log
-from utils.listener_func.clan_remove_listener import process_clan_kick_message, process_clan_leave_command
+
 triggers = {
     "icon_unlock": "as your icon with `/battle set-icon",
     "pro_embed": "to view badge information",
     "clan_leave": "you left **celestial**",
     "clan_kick": re.compile(
-        r"you spent <:pokecoin:\d+>\s+\*\*100,000\*\*\s+to kick\s+.+?\s+from celestial\.",
+        r"you spent <:pokecoin:\d+>\s+(?:\*\*)?100,000(?:\*\*)?\s+to kick\s+.+?\s+from celestial\.",
         re.IGNORECASE,
     ),
 }
@@ -97,7 +99,7 @@ class OnMessageEditCog(commands.Cog):
                 pretty_log(
                     "ready",
                     f"Successfully processed clan leave from message ID {after.id}",
-                    
+
                 )
             except Exception as e:
                 pretty_log(
