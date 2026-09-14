@@ -3,11 +3,9 @@ from datetime import datetime
 import discord
 from discord.ext import commands
 
-from constants.celestial_constants import (
-    CELESTIAL_ROLES,
-    CELESTIAL_SERVER_ID,
-    DEFAULT_EMBED_COLOR,
-)
+from constants.celestial_constants import (CELESTIAL_ROLES,
+                                           CELESTIAL_SERVER_ID,
+                                           DEFAULT_EMBED_COLOR)
 from utils.db.custom_roles_db_func import fetch_custom_role_id_by_user_id
 from utils.functions.pokemon_func import format_price_w_coin
 from utils.functions.pretty_defer import pretty_defer
@@ -59,7 +57,8 @@ async def whois_func(
         f"**Personal Role:** <@&{personal_role_id}>" if personal_role_id else ""
     )
 
-    from utils.cache.celestial_members_cache import fetch_celestial_member_cache
+    from utils.cache.celestial_members_cache import \
+        fetch_celestial_member_cache
 
     user_celestial_info = fetch_celestial_member_cache(user.id)
     if user_celestial_info:
@@ -70,13 +69,13 @@ async def whois_func(
         else:
             member_channel = "N/A"
         actual_perks = user_celestial_info.get("actual_perks") or "N/A"
-        clan_bank_donations = user_celestial_info.get("clan_bank_donations") or 0
-        clan_treasury_donations = (
-            user_celestial_info.get("clan_treasury_donations") or 0
-        )
+        clan_bank_donations = user_celestial_info.get("clan_bank_donation") or 0
+        clan_treasury_donations = user_celestial_info.get("clan_treasury_donation") or 0
         clan_bank_donations_str = (
             f"**Clan Bank Donations:** {format_price_w_coin(clan_bank_donations)}\n"
         )
+        pokemeow_name = user_celestial_info.get("pokemeow_name") or "N/A"
+        pokemeow_name_str = f"**PokéMeow Name:** {pokemeow_name}\n"
         clan_treasury_donations_str = f"**Clan Treasury Donations:** {format_price_w_coin(clan_treasury_donations)}\n"
         total_donations = clan_bank_donations + clan_treasury_donations
         total_donations_str = (
@@ -100,6 +99,7 @@ async def whois_func(
             title = f"Celestial Member Info"
             desc = (
                 f"**User:**{user.mention}\n"
+                f"{pokemeow_name_str}"
                 f"{personal_role_str}\n"
                 f"**Member Channel:** {member_channel.mention if isinstance(member_channel, discord.TextChannel) else member_channel}\n"
                 f"**Perks:** {actual_perks}\n"
