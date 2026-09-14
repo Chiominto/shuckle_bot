@@ -194,8 +194,8 @@ class SHINY_GMAX_EMOJI:
 
 
 class RARITY_EMOJI:
-    golden = "<:Golden:1396343318581084280>"
-    shiny = "<:Shiny:1397370569573273711>"
+    golden = "<:Golden11:1493002874287034519>"
+    shiny = "<:Shiny:1493002869216121023>"
 
 
 GMAX = [

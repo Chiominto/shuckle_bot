@@ -1,10 +1,12 @@
 import re
 from datetime import datetime
+from urllib.parse import urlsplit, urlunsplit
 
 import discord
 
 from constants.aesthetics import *
-from constants.celestial_constants import CELESTIAL_TEXT_CHANNELS, DEFAULT_EMBED_COLOR
+from constants.celestial_constants import (CELESTIAL_TEXT_CHANNELS,
+                                           DEFAULT_EMBED_COLOR)
 from constants.wb_constants import *
 from utils.functions.webhook_func import send_webhook
 from utils.logs.debug_log import debug_log, enable_debug
@@ -23,6 +25,28 @@ SPECIAL_ITEMS = {
     "Metronome": Emojis.metronome,
     "Loaded dice": Emojis.loaded_dice,
 }
+
+
+def get_stable_embed_image_url(image_url: str) -> str:
+    """Remove expiring query parameters from Discord attachment URLs."""
+    if not image_url:
+        return image_url
+
+    parsed_url = urlsplit(image_url)
+    if parsed_url.hostname not in {"media.discordapp.net", "cdn.discordapp.com"}:
+        return image_url
+    if not parsed_url.path.startswith("/attachments/"):
+        return image_url
+
+    return urlunsplit(
+        (
+            "https",
+            "cdn.discordapp.com",
+            parsed_url.path,
+            "",
+            "",
+        )
+    )
 
 
 def get_gmax_assets(name: str, shiny: bool = False) -> dict[str, str | int] | None:
@@ -298,7 +322,7 @@ async def handle_wb_rewards(
 
         # 🖼️ Thumbnail / Image logic
         if image_url:
-            new_embed.set_image(url=image_url)
+            new_embed.set_image(url=get_stable_embed_image_url(image_url))
         elif found_items:
             # Use the first item's emoji as thumbnail if it's a custom emoji
             first_emoji, _ = found_items[0]
