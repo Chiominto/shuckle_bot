@@ -17,6 +17,8 @@ from utils.functions.webhook_func import send_webhook
 # Formats
 from utils.essentials.format import format_comma_pokecoins
 
+from utils.functions.get_pokemon_gifs import get_pokemon_gif
+
 
 from constants.celestial_constants import (
     CELESTIAL_TEXT_CHANNELS,

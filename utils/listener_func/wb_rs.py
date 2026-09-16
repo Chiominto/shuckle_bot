@@ -11,6 +11,7 @@ from constants.wb_constants import *
 from utils.functions.webhook_func import send_webhook
 from utils.logs.debug_log import debug_log, enable_debug
 from utils.logs.pretty_log import pretty_log
+from utils.functions.get_pokemon_gifs import get_pokemon_gif
 
 # 🎯 Define your criteria
 SPECIAL_POKEMON_KEYWORDS = {"Shiny", "Gigantamax"}  # keywords to look for
@@ -287,12 +288,12 @@ async def handle_wb_rewards(
                     image_url = sprite
                 else:
                     display_pokemon.append(f"{poke_name}")
-                    image_url = get_pokemon_thumbnail(poke_name)
+                    image_url = get_pokemon_gif(poke_name)
             else:
                 display_pokemon.append(
                     f"{rarity_emoji} {poke_name}" if rarity_emoji else poke_name
                 )
-                image_url = get_pokemon_thumbnail(poke_name)
+                image_url = get_pokemon_gif(poke_name)
         else:
             image_url = None
 
