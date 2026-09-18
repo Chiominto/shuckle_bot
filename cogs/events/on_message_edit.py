@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands
 
 from constants.celestial_constants import CC_SERVER_ID, POKEMEOW_APPLICATION_ID
+from utils.listener_func.clan_invite_listener import clan_invite_listener
 from utils.listener_func.clan_remove_listener import (
     process_clan_kick_message, process_clan_leave_command)
 from utils.logs.pretty_log import pretty_log
@@ -68,6 +69,27 @@ class OnMessageEditCog(commands.Cog):
             and not after.webhook_id
         ):
             return
+
+        # ————————————————————————————————
+        # 🐢 Clan Invite Handler
+        # ————————————————————————————————
+        if (
+            "Welcome," in after.content
+            and "You have successfully joined" in after.content
+            and "Celestial" in after.content
+        ):
+            try:
+                pretty_log(
+                    message=f"Detected clan invite message edit for member '{after.author.display_name}'.",
+                    tag="info",
+                    label="Clan Invite Command",
+                )
+                await clan_invite_listener(self.bot, after)
+            except Exception as e:
+                pretty_log(
+                    "❌ ERROR",
+                    f"Failed processing clan invite message ID {after.id}: {e}",
+                )
         # 🪓────────────────────────────────────────────
         #        ⚔️ Handle Clan Kick Command
         # 🪓────────────────────────────────────────────

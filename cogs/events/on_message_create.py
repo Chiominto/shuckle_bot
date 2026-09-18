@@ -202,20 +202,7 @@ class MessageCreateListener(commands.Cog):
             and not message.webhook_id
         ):
             return
-        # ————————————————————————————————
-        # 🐢 Clan Invite Handler
-        # ————————————————————————————————
-        if (
-            "Welcome," in message.content
-            and "You have successfully joined" in message.content
-            and "Celestial" in message.content
-        ):
-            pretty_log(
-                message=f"Detected clan invite message edit for member '{message.author.display_name}'.",
-                tag="info",
-                label="Clan Invite Command",
-            )
-            await clan_invite_listener(self.bot, message)
+
         # ————————————————————————————————
         # 🐢 Icon Unlock Handler
         # ————————————————————————————————
