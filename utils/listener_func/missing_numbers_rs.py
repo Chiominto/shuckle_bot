@@ -24,7 +24,7 @@ def extract_info(text: str | None):
     # Strip custom emoji tokens (e.g. <:name:id> or <a:name:id>) and markdown escapes
     # so the surrounding punctuation doesn't break the bold-name/bold-prize matching.
     cleaned = re.sub(r"<a?:\w+:\d+>", "", text)
-    cleaned = re.sub(r"\\(?=[_*~`|>])", "", cleaned)
+    cleaned = re.sub(r"\\(?=[._*~`|>])", "", cleaned)
     cleaned = re.sub(r"\s+", " ", cleaned).strip()
 
     bold_matches = re.findall(r"\*\*(.+?)\*\*", cleaned, flags=re.DOTALL)
