@@ -68,9 +68,13 @@ async def send_missing_number_claim_to_rs(
 
     try:
         member_name, prize = extract_info(embed_description)
-        # Find member object in guild via user_name
+        # Find member object in guild via user_name or display_name (case-insensitive fallback)
         guild = message.guild
-        member = discord.utils.get(guild.members, name=member_name)
+        member = discord.utils.find(
+            lambda m: m.name.lower() == (member_name or "").lower()
+            or m.display_name.lower() == (member_name or "").lower(),
+            guild.members,
+        )
 
         achievement_channel = guild.get_channel(CELESTIAL_TEXT_CHANNELS.rare_spawns)
         if not achievement_channel:
@@ -80,8 +84,13 @@ async def send_missing_number_claim_to_rs(
             )
             return
 
+        if not member:
+            pretty_log(
+                "warning",
+                f"Could not resolve member '{member_name}' in guild {guild.name} ({guild.id}); falling back to plain name",
+            )
 
-
+        member_display = member.mention if member else (member_name or "Someone")
 
         # ──────────────────────────────────────────────
         #   ✅ Build & send embed
@@ -89,7 +98,7 @@ async def send_missing_number_claim_to_rs(
         embed = discord.Embed(
             title="Missing Number Quest Completed",
             url=message.jump_url,
-            description=f"{member.mention} has received **{prize}**!",
+            description=f"{member_display} has received **{prize}**!",
             color=embed_color,
         )
         if embed_image_url:
