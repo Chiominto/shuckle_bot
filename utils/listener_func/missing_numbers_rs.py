@@ -22,25 +22,36 @@ def extract_info(text: str | None):
         return None, None
 
     member_match = re.search(
-        r"(?:^|[^\w])(?P<member>[A-Za-z0-9][A-Za-z0-9_. -]*?)\s*recovered\b",
+        r"(?P<member>[A-Za-z0-9][A-Za-z0-9_. -]*?)\s+(?:has\s+)?(?:recovered|received)\b",
         text,
         flags=re.IGNORECASE,
     )
     received_match = re.search(
-        r"\breceived\b(?:\s*[\U0001F300-\U0001FAFF]\s*)*\s*(?P<prize>.+?)(?:!|$)",
+        r"\b(?:recovered|received)\b(?:\s*[\U0001F300-\U0001FAFF]\s*)*\s*(?P<prize>.+?)(?:!+|$)",
         text,
         flags=re.IGNORECASE | re.DOTALL,
     )
 
     member_name = member_match.group("member").strip() if member_match else None
     missing_number = received_match.group("prize").strip() if received_match else None
-
+    pretty_log(
+        "info",
+        f"Extracted member_name='{member_name}' and missing_number='{missing_number}' from text: {text}",
+    )
     if member_name:
-        member_name = member_name.strip("_")
-    if member_name and member_name.lower().endswith(" recovered"):
-        member_name = member_name.rsplit(" recovered", 1)[0].strip()
+        member_name = member_name.strip("_").strip()
+        for suffix in (" recovered", " received", " has"):
+            if member_name.lower().endswith(suffix):
+                member_name = member_name.rsplit(suffix, 1)[0].strip()
+                break
 
     if missing_number:
+        missing_number = re.sub(
+            r"^(?:\d{2,}:\d{8,}\s*>\s*|>\s*)+",
+            "",
+            missing_number,
+            flags=re.IGNORECASE,
+        )
         missing_number = re.sub(r"^[\W_]+", "", missing_number).strip()
         missing_number = missing_number.strip(" -:;,.")
 
