@@ -67,7 +67,7 @@ from utils.listener_func.donation_listener import (
 from utils.listener_func.market_snipe_filter import should_delete_market_message
 from utils.listener_func.message_listener_debug import handle_test_message
 from utils.listener_func.ms_reports import relay_meowsummit_reports
-
+from utils.listener_func.missing_numbers_rs import send_missing_number_claim_to_rs
 CLAN_BANK_USER_NAMES = ["burgersbank"]
 CC_SHINY_BONUS_CHANNEL_ID = 1457171231445876746
 CODE_USE_PATTERN = re.compile(r"\byou used a code to claim\b", re.IGNORECASE)
@@ -446,7 +446,22 @@ class MessageCreateListener(commands.Cog):
                     f"Failed processing Unown unlock from message ID {getattr(message, 'id', 'unknown')}: {e}",
 
                 )
-
+        # ————————————————————————————————
+        # 🐢 Missing Number Claim Handler
+        # ————————————————————————————————
+        if first_embed:
+            if "the missing numbers completed" in first_embed.title.lower():
+                try:
+                    await send_missing_number_claim_to_rs(bot=self.bot, message=message)
+                    pretty_log(
+                        "ready",
+                        f"Successfully processed missing number claim from message ID {getattr(message, 'id', 'unknown')}",
+                    )
+                except Exception as e:
+                    pretty_log(
+                        "critical",
+                        f"Failed processing missing number claim from message ID {getattr(message, 'id', 'unknown')}: {e}",
+                    )
 
 # 🟣────────────────────────────────────────────
 #         🐢 Setup Function
