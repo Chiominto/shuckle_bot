@@ -21,39 +21,21 @@ def extract_info(text: str | None):
     if not text:
         return None, None
 
-    member_match = re.search(
-        r"(?P<member>[A-Za-z0-9][A-Za-z0-9_. -]*?)\s+(?:has\s+)?(?:recovered|received)\b",
-        text,
-        flags=re.IGNORECASE,
-    )
-    received_match = re.search(
-        r"\b(?:recovered|received)\b(?:\s*[\U0001F300-\U0001FAFF]\s*)*\s*(?P<prize>.+?)(?:!+|$)",
-        text,
-        flags=re.IGNORECASE | re.DOTALL,
-    )
+    # Strip custom emoji tokens (e.g. <:name:id> or <a:name:id>) and markdown escapes
+    # so the surrounding punctuation doesn't break the bold-name/bold-prize matching.
+    cleaned = re.sub(r"<a?:\w+:\d+>", "", text)
+    cleaned = re.sub(r"\\(?=[_*~`|>])", "", cleaned)
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
 
-    member_name = member_match.group("member").strip() if member_match else None
-    missing_number = received_match.group("prize").strip() if received_match else None
+    bold_matches = re.findall(r"\*\*(.+?)\*\*", cleaned, flags=re.DOTALL)
+
+    member_name = bold_matches[0].strip() if bold_matches else None
+    missing_number = bold_matches[-1].strip() if len(bold_matches) >= 2 else None
+
     pretty_log(
         "info",
         f"Extracted member_name='{member_name}' and missing_number='{missing_number}' from text: {text}",
     )
-    if member_name:
-        member_name = member_name.strip("_").strip()
-        for suffix in (" recovered", " received", " has"):
-            if member_name.lower().endswith(suffix):
-                member_name = member_name.rsplit(suffix, 1)[0].strip()
-                break
-
-    if missing_number:
-        missing_number = re.sub(
-            r"^(?:\d{2,}:\d{8,}\s*>\s*|>\s*)+",
-            "",
-            missing_number,
-            flags=re.IGNORECASE,
-        )
-        missing_number = re.sub(r"^[\W_]+", "", missing_number).strip()
-        missing_number = missing_number.strip(" -:;,.")
 
     return member_name, missing_number
 
