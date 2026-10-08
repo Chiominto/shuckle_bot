@@ -8,10 +8,10 @@ from constants.aesthetics import *
 from constants.celestial_constants import (CELESTIAL_TEXT_CHANNELS,
                                            DEFAULT_EMBED_COLOR)
 from constants.wb_constants import *
+from utils.functions.get_pokemon_gifs import get_pokemon_gif
 from utils.functions.webhook_func import send_webhook
 from utils.logs.debug_log import debug_log, enable_debug
 from utils.logs.pretty_log import pretty_log
-from utils.functions.get_pokemon_gifs import get_pokemon_gif
 
 # 🎯 Define your criteria
 SPECIAL_POKEMON_KEYWORDS = {"Shiny", "Gigantamax"}  # keywords to look for
@@ -26,6 +26,9 @@ SPECIAL_ITEMS = {
     "Metronome": Emojis.metronome,
     "Loaded dice": Emojis.loaded_dice,
 }
+
+# 🧠 Dedupe: reward message IDs already processed (on_message + on_message_edit)
+_PROCESSED_WB_REWARD_IDS: set[int] = set()
 
 
 def get_stable_embed_image_url(image_url: str) -> str:
@@ -153,6 +156,11 @@ async def handle_wb_rewards(
     try:
         debug_log("Entered handle_wb_rewards()", highlight=True)
 
+        # 🛑 Skip if this rewards message was already handled (create/edit dedupe)
+        if message.id in _PROCESSED_WB_REWARD_IDS:
+            debug_log(f"Skipping already-processed WB rewards message {message.id}")
+            return
+
         # 🛑 Only process PokéMeow bot messages
         author_str = str(message.author).lower()
         if "pokémeow" not in author_str and "pokemeow" not in author_str:
@@ -221,6 +229,7 @@ async def handle_wb_rewards(
         # Bail early if nothing special found
         # ──────────────
         if not found_items and not found_pokemon:
+            debug_log("No special items or Pokémon found in rewards embed, skipping.")
             return  # nothing worth logging
 
         # ──────────────
@@ -234,8 +243,33 @@ async def handle_wb_rewards(
             )
             member = user_msg.author if isinstance(user_msg, discord.Message) else None
 
+            # 🔄 Fallback: fetch the replied-to message if it wasn't resolved
+            #    (resolved is None when Discord omits referenced_message and the
+            #    original message fell out of the bot's message cache)
+            if (
+                not member
+                and message.reference
+                and getattr(message.reference, "message_id", None)
+            ):
+                try:
+                    ref_msg = await message.channel.fetch_message(
+                        message.reference.message_id
+                    )
+                    member = ref_msg.author
+                except Exception as e:
+                    pretty_log(
+                        "warning",
+                        f"WB rewards: failed to fetch replied-to message {message.reference.message_id}: {e}",
+                        label="🎁 PokéMeow",
+                    )
+
         # 🛑 Require a valid member (PokéMeow must be replying to someone)
         if not member:
+            pretty_log(
+                "warning",
+                f"WB rewards skipped for message ID {message.id}: could not resolve the replied-to member.",
+                label="🎁 PokéMeow",
+            )
             return
 
         # ──────────────
@@ -358,6 +392,11 @@ async def handle_wb_rewards(
                 message.guild.icon.url if message.guild and message.guild.icon else None
             ),
         )
+
+        # ✅ Mark as processed so create/edit listeners don't double-post
+        _PROCESSED_WB_REWARD_IDS.add(message.id)
+        if len(_PROCESSED_WB_REWARD_IDS) > 5000:
+            _PROCESSED_WB_REWARD_IDS.clear()
 
         # Send embed
         log_channel = bot.get_channel(RARE_SPAWN_CHANNEL_ID)

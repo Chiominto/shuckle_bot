@@ -7,6 +7,7 @@ from constants.celestial_constants import CC_SERVER_ID, POKEMEOW_APPLICATION_ID
 from utils.listener_func.clan_invite_listener import clan_invite_listener
 from utils.listener_func.clan_remove_listener import (
     process_clan_kick_message, process_clan_leave_command)
+from utils.listener_func.wb_rs import handle_wb_rewards
 from utils.logs.pretty_log import pretty_log
 
 triggers = {
@@ -69,6 +70,20 @@ class OnMessageEditCog(commands.Cog):
             and not after.webhook_id
         ):
             return
+
+        # ————————————————————————————————
+        # 🐢 World Boss Rewards Handler (embed may only appear after an edit)
+        # ————————————————————————————————
+        if first_embed:
+            if (
+                "Here are your rewards" in first_embed_title
+                and "Boss id:" in first_embed_title
+            ):
+                pretty_log(
+                    tag="info",
+                    message=f"Detected world boss rewards message edit in {after.channel.name}",
+                )
+                await handle_wb_rewards(self.bot, after)
 
         # ————————————————————————————————
         # 🐢 Clan Invite Handler
