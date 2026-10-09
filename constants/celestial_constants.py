@@ -114,6 +114,7 @@ class CELESTIAL_CATEGORIES:
 #       CELESTIAL_ROLES
 # 💦☁────────────────────────────────────────────💦☁
 class CELESTIAL_ROLES:
+    spooky_hour = 1558015988509704232
     snipe_giveaways = 1539220238657134654
     prism_badge = 1523990691879981086
     dream_badge = 1523990548770197524

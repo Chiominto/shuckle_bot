@@ -4,6 +4,7 @@ from discord.ext import commands
 
 # 🧹 Import your scheduled tasks
 from utils.background_tasks.central_loop_tasks.shiny_bonus_checker import check_and_handle_expired_shiny_bonus
+from utils.background_tasks.central_loop_tasks.spooky_hour_checker import check_and_handle_spooky_hour_expiry
 from utils.logs.pretty_log import pretty_log
 
 
@@ -48,6 +49,9 @@ class CentralLoop(commands.Cog):
                 # 💎 Check if shiny bonus has expired
                 await check_and_handle_expired_shiny_bonus(bot=self.bot)
 
+                # 🕒 Check if Spooky Hour has expired
+                await check_and_handle_spooky_hour_expiry(bot=self.bot)
+
             except Exception as e:
                 pretty_log(
                     "error",
@@ -74,5 +78,6 @@ async def setup(bot: commands.Bot):
     print("\n[📋 CENTRAL LOOP CHECKLIST] Scheduled tasks loaded:")
     print("  ─────────────────────────────────────────────")
     print("  ✅ 💎  shiny_bonus_checker")
+    print("  ✅ 🕒  spooky_hour_checker")
     print("  🧭 CentralLoop ticking every 60 seconds!")
     print("  ─────────────────────────────────────────────\n")

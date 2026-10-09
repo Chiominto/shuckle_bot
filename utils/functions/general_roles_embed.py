@@ -155,6 +155,7 @@ def build_general_roles_embed(guild: discord.Guild, user: discord.Member):
         ee_spawn_ping = guild.get_role(CELESTIAL_ROLES.ee_ping)
         calm_waters = guild.get_role(CELESTIAL_ROLES.calm_waters)
         shiny_bonus = guild.get_role(CELESTIAL_ROLES.shiny_bonus)
+        spooky_hour_role = guild.get_role(CELESTIAL_ROLES.spooky_hour)
         os_lotto_ping = guild.get_role(CELESTIAL_ROLES.os_lottery)
         incense_ping = guild.get_role(CELESTIAL_ROLES.incense_ping)
         patreon_auctions_ping = guild.get_role(CELESTIAL_ROLES.patreon_auctions_ping)
@@ -178,7 +179,7 @@ def build_general_roles_embed(guild: discord.Guild, user: discord.Member):
                 )
             )
             roles.append((emoji, snipe_giveaway_role))
-            
+
         if golden_hour_role:
             emoji = "🐟"
             view.add_item(
@@ -212,6 +213,14 @@ def build_general_roles_embed(guild: discord.Guild, user: discord.Member):
                 ToggleRoleButton(role=os_lotto_ping, label="OS Lotto Ping", emoji=emoji)
             )
             roles.append((emoji, os_lotto_ping))
+        if spooky_hour_role:
+            emoji = "👻"
+            view.add_item(
+                ToggleRoleButton(
+                    role=spooky_hour_role, label="Spooky Hour Ping", emoji=emoji
+                )
+            )
+            roles.append((emoji, spooky_hour_role))
 
         if shiny_bonus and clan_member_role in user.roles:
             emoji = "✨"

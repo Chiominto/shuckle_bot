@@ -3,44 +3,35 @@ import re
 import discord
 from discord.ext import commands
 
-from constants.celestial_constants import (
-    CC_BUMP_CHANNEL_ID,
-    CC_SERVER_ID,
-    CELESTIAL_TEXT_CHANNELS,
-    KHY_USER_ID,
-    POKEMEOW_APPLICATION_ID,
-)
-from utils.listener_func.battle_frontier_ach import handle_battle_frontier_achievement
-from utils.listener_func.channel_boost import (
-    boost_channel_listener,
-    remove_boosted_channel_listener,
-)
-from utils.listener_func.channel_myboost_listener import my_boosted_channel_listener
+from constants.celestial_constants import (CC_BUMP_CHANNEL_ID, CC_SERVER_ID,
+                                           CELESTIAL_TEXT_CHANNELS,
+                                           KHY_USER_ID,
+                                           POKEMEOW_APPLICATION_ID)
+from utils.listener_func.battle_frontier_ach import \
+    handle_battle_frontier_achievement
+from utils.listener_func.channel_boost import (boost_channel_listener,
+                                               remove_boosted_channel_listener)
+from utils.listener_func.channel_myboost_listener import \
+    my_boosted_channel_listener
 from utils.listener_func.clan_invite_listener import clan_invite_listener
 from utils.listener_func.code_use_listener import send_code_claim_to_rs
 from utils.listener_func.ee_spawn_listener import (
-    check_cc_bump_reminder,
-    check_ee_near_spawn_alert,
-    extract_boss_from_wb_command_embed,
-    extract_boss_from_wb_spawn_command,
-)
+    check_cc_bump_reminder, check_ee_near_spawn_alert,
+    extract_boss_from_wb_command_embed, extract_boss_from_wb_spawn_command)
 from utils.listener_func.golden_stone_listener import golden_stone_listener
 from utils.listener_func.icon_unlock_listener import icon_unlock_listener
-from utils.listener_func.incense_listener import (
-    incense_command_handler,
-    incense_depleted_handler,
-    incense_use_handler,
-    server_has_incense_handler,
-)
+from utils.listener_func.incense_listener import (incense_command_handler,
+                                                  incense_depleted_handler,
+                                                  incense_use_handler,
+                                                  server_has_incense_handler)
 from utils.listener_func.shiny_bonus_listener import (
-    handle_pokemeow_global_bonus,
-    read_shiny_bonus_timestamp_from_cc_channel,
-)
+    handle_pokemeow_global_bonus, read_shiny_bonus_timestamp_from_cc_channel)
+from utils.listener_func.unown_unlocks import process_unown_unlock
 from utils.listener_func.wb_rs import handle_wb_rewards
 from utils.logs.pretty_log import pretty_log
 from utils.quick_codes.sync_donation_roles import sync_donation_roles
 from utils.quick_codes.sync_play_category_perms import sync_play_category_perms
-from utils.listener_func.unown_unlocks import process_unown_unlock
+
 CC_MH_REPORT_CHANNEL_ID = 1502156762466357338
 triggers = {
     "channel_boost": "<:checkedbox:752302633141665812> successfully applied a +5% channel boost to",
@@ -58,16 +49,20 @@ triggers = {
     "has_incense": "<:incense:1202436296874922065> An `;incense` is currently active in this server!",
     "incense_depleted": "your server's incense has run out!",
     "incense_use": "Incense. Your server has received the following benefits",
+    "hw_embed": "happy halloween pokemeow! participate in activities for rewards!",
 }
 from utils.listener_func.calculations import computation_listener
-from utils.listener_func.donation_listener import (
-    clan_donate_listener,
-    give_command_listener,
-)
-from utils.listener_func.market_snipe_filter import should_delete_market_message
+from utils.listener_func.donation_listener import (clan_donate_listener,
+                                                   give_command_listener)
+from utils.listener_func.market_snipe_filter import \
+    should_delete_market_message
 from utils.listener_func.message_listener_debug import handle_test_message
+from utils.listener_func.missing_numbers_rs import \
+    send_missing_number_claim_to_rs
 from utils.listener_func.ms_reports import relay_meowsummit_reports
-from utils.listener_func.missing_numbers_rs import send_missing_number_claim_to_rs
+from utils.listener_func.spooky_hour_listener import \
+    handle_spooky_hour_hw_embed
+
 CLAN_BANK_USER_NAMES = ["burgersbank"]
 CC_SHINY_BONUS_CHANNEL_ID = 1457171231445876746
 CODE_USE_PATTERN = re.compile(r"\byou used a code to claim\b", re.IGNORECASE)
@@ -202,7 +197,25 @@ class MessageCreateListener(commands.Cog):
             and not message.webhook_id
         ):
             return
+        # 🌊────────────────────────────────────────────
+        #          Spooky Hour HW Embed Handler
+        # 🌊────────────────────────────────────────────
+        if triggers["hw_embed"].lower() in first_embed_author.lower():
+            try:
+                await handle_spooky_hour_hw_embed(bot=self.bot, message=message)
+                pretty_log(
+                    "ready",
+                    f"Processed Spooky Hour HW embed from message ID {message.id}",
 
+                    label="Spooky Hour HW",
+                )
+            except Exception as e:
+                pretty_log(
+                    "❌ ERROR",
+                    f"Failed processing Spooky Hour HW embed from message ID {message.id}: {e}",
+
+                    label="Spooky Hour HW",
+                )
         # ————————————————————————————————
         # 🐢 Icon Unlock Handler
         # ————————————————————————————————
@@ -462,6 +475,8 @@ class MessageCreateListener(commands.Cog):
                         "critical",
                         f"Failed processing missing number claim from message ID {getattr(message, 'id', 'unknown')}: {e}",
                     )
+
+
 
 # 🟣────────────────────────────────────────────
 #         🐢 Setup Function
