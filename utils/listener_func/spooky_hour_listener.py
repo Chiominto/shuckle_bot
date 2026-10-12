@@ -3,7 +3,9 @@ import re
 import discord
 
 from constants.aesthetics import *
-from constants.celestial_constants import (CELESTIAL_ROLES,
+from constants.celestial_constants import (CC_GUILD_ID,
+                                           CC_SPOOKY_HOUR_CHANNEL_ID,
+                                           CELESTIAL_ROLES,
                                            CELESTIAL_TEXT_CHANNELS)
 from utils.db.spooky_hour_db import (fetch_spooky_hour, remove_spooky_hour,
                                      upsert_spooky_hour)
@@ -37,6 +39,8 @@ def build_spooky_hour_embed(
     footer_text: str = None,
 ):
     halloween_color = 0xFFA500  # Orange color for Halloween theme
+    if codes_count is None:
+        codes_count = 0
     if codes_count > 0:
         code_status = (
             f"> - **{codes_count} codes** remain to be claimed (max. 1 per account)"
@@ -81,6 +85,19 @@ def extract_irida_codes_count(embed: discord.Embed) -> int | None:
             return int(match.group(1))
     return None
 
+def create_cc_spooky_hour_embed(ends_on: int, footer_text: str = None, codes_count: int = None):
+    """Builds an embed with information about the Spooky Hour event."""
+    if codes_count is None:
+        codes_count = 0
+    embed = discord.Embed(
+        title =ends_on,
+        description = codes_count,
+        color=0xFFA500,  # Orange color for Halloween theme
+    )
+    embed.set_footer(
+        text=footer_text
+    )
+    return embed
 
 # 🤍💫────────────────────────────────────────────💫🤍
 #        🕒 Spooky Hour Listener Functions
@@ -108,7 +125,54 @@ async def handle_spooky_hour_hw_embed(bot: discord.Client, message: discord.Mess
                 existing_message_id = existing_spooky_hour_info["message_id"]
 
                 if existing_ends_on != ends_on:
-                    await upsert_spooky_hour(bot, ends_on, existing_message_id)
+                    # 🔄 New schedule info — update the previous embed with new details
+                    footer_text = embed.footer.text if embed.footer else None
+                    codes_count = extract_irida_codes_count(embed)
+                    if codes_count is None:
+                        codes_count = (
+                            existing_spooky_hour_info.get("special_code_count") or 0
+                        )
+                    updated_embed = build_spooky_hour_embed(
+                        message.guild, ends_on, codes_count, footer_text=footer_text
+                    )
+
+                    updated_message_id = existing_message_id
+                    try:
+                        previous_message = await event_tracker_channel.fetch_message(
+                            existing_message_id
+                        )
+                        await previous_message.edit(embed=updated_embed)
+                        pretty_log(
+                            "success",
+                            f"Updated spooky hour embed {existing_message_id} with new ends_on {ends_on}",
+
+                        )
+                    except discord.NotFound:
+                        # Previous message was deleted — send a fresh one
+                        await cleanup_first_match(
+                            bot=bot,
+                            channel=event_tracker_channel,
+                            component="description",
+                            phrase="Spooky Hour is active!",
+                        )
+                        view = SpookyHourToggleButton()
+                        content = f"{spooky_hour_role.mention} is now active!"
+                        new_message = await event_tracker_channel.send(
+                            content=content, embed=updated_embed, view=view
+                        )
+                        updated_message_id = new_message.id
+                        pretty_log(
+                            "info",
+                            f"Previous spooky hour message {existing_message_id} not found, sent new message {new_message.id}",
+
+                        )
+
+                    await upsert_spooky_hour(
+                        bot,
+                        ends_on,
+                        updated_message_id,
+                        special_code_count=codes_count,
+                    )
                 elif existing_ends_on == ends_on:
                     pretty_log(
                         "info",
@@ -135,41 +199,33 @@ async def handle_spooky_hour_hw_embed(bot: discord.Client, message: discord.Mess
                 new_message = await event_tracker_channel.send(
                     content=content, embed=embed, view=view
                 )
-                await upsert_spooky_hour(bot, ends_on, new_message.id)
+                await upsert_spooky_hour(
+                    bot, ends_on, new_message.id, special_code_count=codes_count
+                )
                 pretty_log(
                     "success",
                     f"Inserted new spooky_hour with ends_on {ends_on} and message_id {new_message.id}",
 
                 )
 
-                """# Send the same embed to MS Spooky Hour channel
-                ms_guild = bot.get_guild(MEOWSUMMIT_GUILD_ID)
-                if ms_guild:
-                    ms_spooky_hour_channel = ms_guild.get_channel(MS_BUMPS_CHANNEL_ID)
-                    ms_spooky_hour_role = ms_guild.get_role(MS_SPOOKY_HOUR_ID)
-                    if ms_spooky_hour_channel and ms_spooky_hour_role:
+                # Create CC info embed and send it to the CC Spooky Hour channel
+                cc_guild = bot.get_guild(CC_GUILD_ID)
+                cc_spooky_hour_channel = bot.get_channel(CC_SPOOKY_HOUR_CHANNEL_ID)
+                if cc_spooky_hour_channel:
+                    # Create embed
+                    cc_embed = create_cc_spooky_hour_embed(ends_on=ends_on, footer_text=footer_text, codes_count=codes_count)
+                    await cc_spooky_hour_channel.send(embed=cc_embed)
+                    pretty_log(
+                        "success",
+                        f"Sent Spooky Hour embed to CC channel {CC_SPOOKY_HOUR_CHANNEL_ID}",
 
-                        await cleanup_first_match(
-                            bot=bot,
-                            channel=ms_spooky_hour_channel,
-                            component="description",
-                            phrase="Spooky Hour is active!",
-                        )
+                    )
+                else:
+                    pretty_log(
+                        "info",
+                        "CC spooky hour channel not found, skipping CC embed",
 
-                        ms_content = (
-                            f"{ms_spooky_hour_role.mention} Spooky Hour is now active!"
-                        )
-                        ms_embed = build_spooky_hour_embed(
-                            ms_guild, ends_on, codes_count
-                        )
-                        await ms_spooky_hour_channel.send(
-                            content=ms_content, embed=ms_embed, view=view
-                        )
-                        pretty_log(
-                            "success",
-                            "Sent Spooky Hour embed to Meow Summit Spooky Hour channel",
-                            ServerContext.MEOW_SUMMIT,
-                        )"""
+                    )
 
                 return
 

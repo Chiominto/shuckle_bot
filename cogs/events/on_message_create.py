@@ -6,7 +6,8 @@ from discord.ext import commands
 from constants.celestial_constants import (CC_BUMP_CHANNEL_ID, CC_SERVER_ID,
                                            CELESTIAL_TEXT_CHANNELS,
                                            KHY_USER_ID,
-                                           POKEMEOW_APPLICATION_ID)
+                                           POKEMEOW_APPLICATION_ID,
+                                           CC_SPOOKY_HOUR_CHANNEL_ID)
 from utils.listener_func.battle_frontier_ach import \
     handle_battle_frontier_achievement
 from utils.listener_func.channel_boost import (boost_channel_listener,
@@ -31,7 +32,8 @@ from utils.listener_func.wb_rs import handle_wb_rewards
 from utils.logs.pretty_log import pretty_log
 from utils.quick_codes.sync_donation_roles import sync_donation_roles
 from utils.quick_codes.sync_play_category_perms import sync_play_category_perms
-
+from utils.listener_func.cc_spooky_hour_listener import \
+    handle_cc_spooky_hour_message
 CC_MH_REPORT_CHANNEL_ID = 1502156762466357338
 triggers = {
     "channel_boost": "<:checkedbox:752302633141665812> successfully applied a +5% channel boost to",
@@ -167,7 +169,14 @@ class MessageCreateListener(commands.Cog):
                     label="MeowSummit Report Relay",
                 )
                 await relay_meowsummit_reports(bot=self.bot, message=message)
-
+            if message.channel.id == CC_SPOOKY_HOUR_CHANNEL_ID:
+                pretty_log(
+                    "info",
+                    f"Detected message in CC spooky hour channel: Message ID {message.id}",
+                    label="CC Spooky Hour Listener",
+                )
+                await handle_cc_spooky_hour_message(bot=self.bot, message=message)
+                
         # ————————————————————————————————
         # 🐢 Message Variables
         # ————————————————————————————————
