@@ -8,6 +8,7 @@ from utils.listener_func.golden_stone_listener import golden_stone_listener
 from utils.logs.debug_log import debug_enabled, debug_log, enable_debug
 from utils.logs.pretty_log import pretty_log
 from utils.listener_func.unown_unlocks import process_unown_unlock
+from utils.listener_func.promo_claim_listener import promo_claim_listener
 # enable_debug(f"{__name__}.handle_test_message")
 triggers = {
     "battle_frontier_ach": "🎖️ You may continue your",
@@ -28,6 +29,20 @@ async def handle_test_message(bot: discord.Client, message: discord.Message):
         return
     replied_message_content = getattr(replied_message, "content", "").lower()
     debug_log(f"Fetched replied message content: '{replied_message_content}'")
+
+    replied_embed = replied_message.embeds[0] if replied_message.embeds else None
+    replied_embed_author = (
+        replied_embed.author.name if replied_embed and replied_embed.author else ""
+    )
+    replied_embed_description = (
+        replied_embed.description if replied_embed and replied_embed.description else ""
+    )
+    replied_embed_footer = (
+        replied_embed.footer.text if replied_embed and replied_embed.footer else ""
+    )
+    replied_embed_title = (
+        replied_embed.title if replied_embed and replied_embed.title else ""
+    )
 
     # 🌟────────────────────────────────────────────
     #   💠 Battle Frontier Achievement Handler
@@ -86,3 +101,24 @@ async def handle_test_message(bot: discord.Client, message: discord.Message):
                 "critical",
                 f"Failed processing Unown unlock from message ID {getattr(message, 'id', 'unknown')}: {e}",
             )
+
+    # 💙───────────────────────────────────────────────💙
+    # 🫧 Promo Claim Processing
+    # 💙───────────────────────────────────────────────💙
+    if replied_embed:
+        if (
+            "spent" in replied_embed_description.lower()
+            and "claimed a" in replied_embed_description.lower()
+            and "PokeMeow Special Golden Promotionals" in replied_embed_author
+        ):
+            try:
+                await promo_claim_listener(bot=bot, message=replied_message)
+                pretty_log(
+                    "ready",
+                    f"Successfully processed promo claim from message ID {getattr(message, 'id', 'unknown')}",
+                )
+            except Exception as e:
+                pretty_log(
+                    "❌ ERROR",
+                    f"Failed processing promo claim from message ID {getattr(message, 'id', 'unknown')}: {e}",
+                )

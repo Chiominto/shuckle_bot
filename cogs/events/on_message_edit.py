@@ -6,7 +6,10 @@ from discord.ext import commands
 from constants.celestial_constants import CC_SERVER_ID, POKEMEOW_APPLICATION_ID
 from utils.listener_func.clan_invite_listener import clan_invite_listener
 from utils.listener_func.clan_remove_listener import (
-    process_clan_kick_message, process_clan_leave_command)
+    process_clan_kick_message,
+    process_clan_leave_command,
+)
+
 from utils.listener_func.wb_rs import handle_wb_rewards
 from utils.logs.pretty_log import pretty_log
 
@@ -113,19 +116,16 @@ class OnMessageEditCog(commands.Cog):
                 pretty_log(
                     "info",
                     f"Detected clan kick in message ID {after.id} in channel {after.channel.name}",
-
                 )
                 await process_clan_kick_message(bot=self.bot, message=after)
                 pretty_log(
                     "ready",
                     f"Successfully processed clan kick in message ID {after.id}",
-
                 )
             except Exception as e:
                 pretty_log(
                     "❌ ERROR",
                     f"Failed processing clan kick in message ID {after.id}: {e}",
-
                 )
         # 💙───────────────────────────────────────────────💙
         # 🫧 Clan Leave Processing
@@ -136,14 +136,14 @@ class OnMessageEditCog(commands.Cog):
                 pretty_log(
                     "ready",
                     f"Successfully processed clan leave from message ID {after.id}",
-
                 )
             except Exception as e:
                 pretty_log(
                     "❌ ERROR",
                     f"Failed processing clan leave from message ID {after.id}: {e}",
-
                 )
+
+
 # 🟣────────────────────────────────────────────
 #         🐢 Setup Function
 # 🟣────────────────────────────────────────────
