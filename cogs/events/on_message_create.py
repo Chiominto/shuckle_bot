@@ -55,9 +55,11 @@ from utils.listener_func.message_listener_debug import handle_test_message
 from utils.listener_func.missing_numbers_rs import send_missing_number_claim_to_rs
 from utils.listener_func.ms_reports import relay_meowsummit_reports
 from utils.listener_func.spooky_hour_listener import handle_spooky_hour_hw_embed
+from utils.listener_func.res_egg_listener import handle_res_egg_hatch
 
 CC_MH_REPORT_CHANNEL_ID = 1502156762466357338
 triggers = {
+    "res_egg": "Research Lab Hatch",
     "channel_boost": "<:checkedbox:752302633141665812> successfully applied a +5% channel boost to",
     "remove_channel_boost": "<:checkedbox:752302633141665812> successfully removed the channel boost from channel",
     "channel_my_boost": "<:channel_boost:1334580555374919680> your channel boosts (across all servers)",
@@ -512,7 +514,22 @@ class MessageCreateListener(commands.Cog):
                         "❌ ERROR",
                         f"Failed processing promo claim from message ID {getattr(message, 'id', 'unknown')}: {e}",
                     )
-
+        # 💙───────────────────────────────────────────────💙
+        # 🫧 Research Lab Egg Hatch Processing
+        # 💙───────────────────────────────────────────────💙
+        if first_embed:
+            if triggers["res_egg"].lower() in first_embed_author.lower():
+                try:
+                    await handle_res_egg_hatch(bot=self.bot, message=message)
+                    pretty_log(
+                        "ready",
+                        f"Successfully processed Research Lab egg hatch from message ID {getattr(message, 'id', 'unknown')}",
+                    )
+                except Exception as e:
+                    pretty_log(
+                        "critical",
+                        f"Failed processing Research Lab egg hatch from message ID {getattr(message, 'id', 'unknown')}: {e}",
+                    )
 
 # 🟣────────────────────────────────────────────
 #         🐢 Setup Function
