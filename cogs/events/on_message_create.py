@@ -518,7 +518,7 @@ class MessageCreateListener(commands.Cog):
         # 🫧 Research Lab Egg Hatch Processing
         # 💙───────────────────────────────────────────────💙
         if first_embed:
-            if triggers["res_egg"].lower() in first_embed_author.lower():
+            if "research lab hatch" in first_embed_author.lower():
                 try:
                     await handle_res_egg_hatch(bot=self.bot, message=message)
                     pretty_log(
