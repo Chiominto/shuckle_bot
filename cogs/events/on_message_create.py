@@ -504,6 +504,10 @@ class MessageCreateListener(commands.Cog):
                 and "PokeMeow Special Golden Promotionals" in first_embed_author
             ):
                 try:
+                    pretty_log(
+                        "ready",
+                        f"Processing promo claim from message ID {getattr(message, 'id', 'unknown')}",
+                    )
                     await promo_claim_listener(bot=self.bot, message=message)
                     pretty_log(
                         "ready",
@@ -520,6 +524,10 @@ class MessageCreateListener(commands.Cog):
         if first_embed:
             if "research lab hatch" in first_embed_author.lower():
                 try:
+                    pretty_log(
+                        "ready",
+                        f"Processing Research Lab egg hatch from message ID {getattr(message, 'id', 'unknown')}",
+                    )
                     await handle_res_egg_hatch(bot=self.bot, message=message)
                     pretty_log(
                         "ready",
