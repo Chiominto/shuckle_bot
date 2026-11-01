@@ -496,7 +496,7 @@ class MessageCreateListener(commands.Cog):
         # ————————————————————————————————
         # 🐢 Missing Number Claim Handler
         # ————————————————————————————————
-        if first_embed:
+        if first_embed and first_embed_title:
             if "the missing numbers completed" in first_embed_title.lower():
                 try:
                     await send_missing_number_claim_to_rs(bot=self.bot, message=message)
@@ -513,7 +513,7 @@ class MessageCreateListener(commands.Cog):
         # 💙───────────────────────────────────────────────💙
         # 🫧 Promo Claim Processing
         # 💙───────────────────────────────────────────────💙
-        if first_embed:
+        if first_embed and first_embed_author and first_embed_description:
             if (
                 "spent" in first_embed_description.lower()
                 and "claimed a" in first_embed_description.lower()
