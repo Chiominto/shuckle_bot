@@ -58,6 +58,7 @@ from utils.listener_func.spooky_hour_listener import handle_spooky_hour_hw_embed
 from utils.listener_func.res_egg_listener import handle_res_egg_hatch
 
 CC_MH_REPORT_CHANNEL_ID = 1502156762466357338
+DEBUG_CHANNEL_ID = 1528225942604878125
 triggers = {
     "res_egg": "Research Lab Hatch",
     "channel_boost": "<:checkedbox:752302633141665812> successfully applied a +5% channel boost to",
@@ -91,11 +92,26 @@ class MessageCreateListener(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
+    def debug_log_channel_message(self, message: discord.Message):
+        """Temporary: log what the bot receives in DEBUG_CHANNEL_ID."""
+        embed = message.embeds[0] if message.embeds else None
+        author = embed.author.name if embed and embed.author else None
+        pretty_log(
+            "debug",
+            f"[DEBUG CHANNEL] id={message.id} author={message.author} "
+            f"(id={message.author.id}, bot={message.author.bot}, webhook={message.webhook_id}) "
+            f"content={message.content!r} embeds={len(message.embeds)} "
+            f"embed_author={author!r} "
+            f"embed_desc={(embed.description[:200] if embed and embed.description else None)!r}",
+        )
+
     # 🟣────────────────────────────────────────────
     #         🐢 Message Listener Event
     # 🟣────────────────────────────────────────────
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
+        if message.channel.id == DEBUG_CHANNEL_ID:
+            self.debug_log_channel_message(message)
 
         # ————————————————————————————————
         # 🏰 Guild Check — Route by server
@@ -445,7 +461,7 @@ class MessageCreateListener(commands.Cog):
         # 🌟────────────────────────────────────────────
         #   💠 My Boosted Channel Listener
         # 🌟────────────────────────────────────────────
-        if triggers["channel_my_boost"].lower() in embed_title.lower() and embed_title:
+        if first_embed_title and triggers["channel_my_boost"].lower() in first_embed_title.lower():
 
             try:
                 await my_boosted_channel_listener(bot=self.bot, message=message)
@@ -481,7 +497,7 @@ class MessageCreateListener(commands.Cog):
         # 🐢 Missing Number Claim Handler
         # ————————————————————————————————
         if first_embed:
-            if "the missing numbers completed" in first_embed.title.lower():
+            if "the missing numbers completed" in first_embed_title.lower():
                 try:
                     await send_missing_number_claim_to_rs(bot=self.bot, message=message)
                     pretty_log(
@@ -499,8 +515,8 @@ class MessageCreateListener(commands.Cog):
         # 💙───────────────────────────────────────────────💙
         if first_embed:
             if (
-                "spent" in first_embed.description.lower()
-                and "claimed a" in first_embed.description.lower()
+                "spent" in first_embed_description.lower()
+                and "claimed a" in first_embed_description.lower()
                 and "PokeMeow Special Golden Promotionals" in first_embed_author
             ):
                 try:
@@ -521,23 +537,22 @@ class MessageCreateListener(commands.Cog):
         # 💙───────────────────────────────────────────────💙
         # 🫧 Research Lab Egg Hatch Processing
         # 💙───────────────────────────────────────────────💙
-        if first_embed:
-            if "research lab hatch" in first_embed_author.lower():
-                try:
-                    pretty_log(
-                        "ready",
-                        f"Processing Research Lab egg hatch from message ID {getattr(message, 'id', 'unknown')}",
-                    )
-                    await handle_res_egg_hatch(bot=self.bot, message=message)
-                    pretty_log(
-                        "ready",
-                        f"Successfully processed Research Lab egg hatch from message ID {getattr(message, 'id', 'unknown')}",
-                    )
-                except Exception as e:
-                    pretty_log(
-                        "critical",
-                        f"Failed processing Research Lab egg hatch from message ID {getattr(message, 'id', 'unknown')}: {e}",
-                    )
+        if first_embed and "research lab hatch" in first_embed_author.lower():
+            try:
+                pretty_log(
+                    "ready",
+                    f"Processing Research Lab egg hatch from message ID {getattr(message, 'id', 'unknown')}",
+                )
+                await handle_res_egg_hatch(bot=self.bot, message=message)
+                pretty_log(
+                    "ready",
+                    f"Successfully processed Research Lab egg hatch from message ID {getattr(message, 'id', 'unknown')}",
+                )
+            except Exception as e:
+                pretty_log(
+                    "critical",
+                    f"Failed processing Research Lab egg hatch from message ID {getattr(message, 'id', 'unknown')}: {e}",
+                )
 
 # 🟣────────────────────────────────────────────
 #         🐢 Setup Function
