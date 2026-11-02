@@ -87,19 +87,19 @@ async def handle_res_egg_hatch(bot: discord.Client, message: discord.Message):
         return
 
     if hatched_mon.lower() in RARE_EGG_EXCLUSIVES:
-        display_name = f"{Emojis.Rare} {hatched_mon}"
+        display_name = f"{Emojis.Rare} {hatched_mon.title()}"
     elif hatched_mon.lower() in SUPER_RARE_EGG_EXCLUSIVE:
-        display_name = f"{Emojis.SuperRare} {hatched_mon}"
+        display_name = f"{Emojis.SuperRare} {hatched_mon.title()}"
     elif "shiny" in hatched_mon.lower():
         # Remove Shiny from the name for display
         clean_name = hatched_mon.lower().replace("shiny", "").strip()
-        display_name = f"{Emojis.Shiny} {clean_name}"
+        display_name = f"{Emojis.Shiny} {clean_name.title()}"
     elif "golden" in hatched_mon.lower():
         # Remove Golden from the name for display
         clean_name = hatched_mon.lower().replace("golden", "").strip()
-        display_name = f"{Emojis.Golden} {clean_name}"
+        display_name = f"{Emojis.Golden} {clean_name.title()}"
     else:
-        display_name = hatched_mon
+        display_name = hatched_mon.title()
 
     rarespawn_channel = message.guild.get_channel(CELESTIAL_TEXT_CHANNELS.rare_spawns)
 
