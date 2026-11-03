@@ -201,7 +201,8 @@ async def handle_wb_rewards(
                     "",
                     poke_name_clean,
                     flags=re.IGNORECASE,
-                ).strip("! ")
+                ).strip()
+                poke_name_clean = re.sub(r"\W+$", "", poke_name_clean).strip()
 
                 # ✅ Only keep if starts with desired prefixes (case-insensitive)
                 valid_prefixes = [
