@@ -16,6 +16,7 @@ from utils.functions.design_embed import design_embed
 from utils.functions.pokemeow_reply import get_pokemeow_reply_or_interaction_member
 from utils.functions.webhook_func import send_webhook
 from utils.logs.pretty_log import pretty_log
+from utils.functions.pokemon_func import get_mon_value, get_dex_number_by_name
 
 RARE_EGG_EXCLUSIVES = [
     "chingling",
@@ -100,13 +101,13 @@ async def handle_res_egg_hatch(bot: discord.Client, message: discord.Message):
         display_name = f"{Emojis.Golden} {clean_name.title()}"
     else:
         display_name = hatched_mon.title()
-
+    dex_number = get_dex_number_by_name(hatched_mon)
     rarespawn_channel = message.guild.get_channel(CELESTIAL_TEXT_CHANNELS.rare_spawns)
 
     rs_embed = discord.Embed(
         title=f"**{egg_type.title()}** hatched in **{incubator_num.title()}**",
         url=message.jump_url,
-        description=f"{display_name}",
+        description=f"{display_name} #{dex_number}",
         color=embed_color
     )
 
@@ -114,7 +115,18 @@ async def handle_res_egg_hatch(bot: discord.Client, message: discord.Message):
         rs_embed.set_image(url=embed_image_url)
     if embed_author_text:
         rs_embed.set_author(name=embed_author_text, icon_url=embed_author_icon_url)
-
+    mon_value = await get_mon_value(bot, hatched_mon)
+    if mon_value and mon_value.get("has_market_value"):
+        last_seen = mon_value.get("last_seen")
+        last_seen_text = (
+            f"Value as of {last_seen}" if last_seen != "N/A" else "Value"
+        )
+        current_listing = mon_value.get("current_listing")
+        rs_embed.add_field(
+            name=last_seen_text,
+            value=current_listing,
+            inline=False
+        )
     await send_webhook(
         bot=bot,
         channel=rarespawn_channel,
