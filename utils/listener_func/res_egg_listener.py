@@ -19,7 +19,7 @@ from utils.logs.pretty_log import pretty_log
 from utils.functions.pokemon_func import get_mon_value, get_dex_number_by_name
 from utils.logs.debug_log import debug_log, enable_debug
 
-enable_debug(f"{__name__}.handle_res_egg_hatch")
+#enable_debug(f"{__name__}.handle_res_egg_hatch")
 RARE_EGG_EXCLUSIVES = [
     "chingling",
     "mimejr",
@@ -151,6 +151,7 @@ async def handle_res_egg_hatch(bot: discord.Client, message: discord.Message):
         debug_log(f"No market value available for {hatched_mon}.")
 
     debug_log(f"Sending rare-spawn announcement to channel {rarespawn_channel}.")
+    rs_embed.set_footer(text=f"Hatched in {message.guild.name}", icon_url=message.guild.icon.url if message.guild.icon else None)
     await send_webhook(
         bot=bot,
         channel=rarespawn_channel,
