@@ -90,7 +90,7 @@ async def handle_res_egg_hatch(bot: discord.Client, message: discord.Message):
     if hatched_mon.lower() in RARE_EGG_EXCLUSIVES:
         display_name = f"{Emojis.Rare} {hatched_mon.title()}"
     elif hatched_mon.lower() in SUPER_RARE_EGG_EXCLUSIVE:
-        display_name = f"{Emojis.SuperRare} {hatched_mon.title()}"
+        display_name = f"{Emojis.Super_Rare} {hatched_mon.title()}"
     elif "shiny" in hatched_mon.lower():
         # Remove Shiny from the name for display
         clean_name = hatched_mon.lower().replace("shiny", "").strip()
