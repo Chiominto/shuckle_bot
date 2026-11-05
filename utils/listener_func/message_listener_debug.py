@@ -9,6 +9,7 @@ from utils.logs.debug_log import debug_enabled, debug_log, enable_debug
 from utils.logs.pretty_log import pretty_log
 from utils.listener_func.unown_unlocks import process_unown_unlock
 from utils.listener_func.promo_claim_listener import promo_claim_listener
+from utils.listener_func.res_egg_listener import handle_res_egg_hatch
 # enable_debug(f"{__name__}.handle_test_message")
 triggers = {
     "battle_frontier_ach": "🎖️ You may continue your",
@@ -122,3 +123,23 @@ async def handle_test_message(bot: discord.Client, message: discord.Message):
                     "❌ ERROR",
                     f"Failed processing promo claim from message ID {getattr(message, 'id', 'unknown')}: {e}",
                 )
+
+    # 💙───────────────────────────────────────────────💙
+    # 🫧 Research Lab Egg Hatch Processing
+    # 💙───────────────────────────────────────────────💙
+    if replied_embed and "research lab hatch" in replied_embed_author.lower():
+        try:
+            pretty_log(
+                "ready",
+                f"Processing Research Lab egg hatch from message ID {getattr(replied_message, 'id', 'unknown')}",
+            )
+            await handle_res_egg_hatch(bot=bot, message=replied_message)
+            pretty_log(
+                "ready",
+                f"Successfully processed Research Lab egg hatch from message ID {getattr(replied_message, 'id', 'unknown')}",
+            )
+        except Exception as e:
+            pretty_log(
+                "critical",
+                f"Failed processing Research Lab egg hatch from message ID {getattr(replied_message, 'id', 'unknown')}: {e}",
+            )

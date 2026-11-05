@@ -17,7 +17,9 @@ from utils.functions.pokemeow_reply import get_pokemeow_reply_or_interaction_mem
 from utils.functions.webhook_func import send_webhook
 from utils.logs.pretty_log import pretty_log
 from utils.functions.pokemon_func import get_mon_value, get_dex_number_by_name
+from utils.logs.debug_log import debug_log, enable_debug
 
+enable_debug(f"{__name__}.handle_res_egg_hatch")
 RARE_EGG_EXCLUSIVES = [
     "chingling",
     "mimejr",
@@ -62,18 +64,26 @@ def extract_hatch_info(message: str) -> dict | None:
 
 
 async def handle_res_egg_hatch(bot: discord.Client, message: discord.Message):
-
+    debug_log(
+        f"Processing res egg hatch message {message.id} in guild "
+        f"{getattr(message.guild, 'id', None)}."
+    )
     embed = message.embeds[0] if message.embeds else None
     if not embed:
+        debug_log("No embed found; ignoring message.")
         return
+    debug_log(f"Using embed with title: {embed.title!r}")
+
     hatch_info = extract_hatch_info(embed.description)
     if not hatch_info:
+        debug_log("Could not extract hatch information from the embed description.")
         return
+    debug_log(f"Extracted hatch information: {hatch_info}")
+
     embed_color = embed.color
     embed_image_url = embed.image.url if embed.image else None
     embed_author_text = embed.author.name if embed.author else None
     embed_author_icon_url = embed.author.icon_url if embed.author else None
-
 
     egg_type = hatch_info["egg_type"]
     hatched_mon = hatch_info["hatched_mon"]
@@ -85,6 +95,7 @@ async def handle_res_egg_hatch(bot: discord.Client, message: discord.Message):
         and "shiny" not in hatched_mon.lower()
         and "golden" not in hatched_mon.lower()
     ):
+        debug_log(f"{hatched_mon} is not a rare, shiny, or golden hatch; ignoring it.")
         return
 
     if hatched_mon.lower() in RARE_EGG_EXCLUSIVES:
@@ -101,13 +112,20 @@ async def handle_res_egg_hatch(bot: discord.Client, message: discord.Message):
         display_name = f"{Emojis.Golden} {clean_name.title()}"
     else:
         display_name = hatched_mon.title()
+    debug_log(f"Preparing rare-spawn announcement for {hatched_mon} as {display_name}.")
+
     dex_number = get_dex_number_by_name(hatched_mon)
     rarespawn_channel = message.guild.get_channel(CELESTIAL_TEXT_CHANNELS.rare_spawns)
+    if not rarespawn_channel:
+        debug_log(
+            "Rare-spawns channel was not found "
+            f"(ID: {CELESTIAL_TEXT_CHANNELS.rare_spawns})."
+        )
 
     rs_embed = discord.Embed(
         title=f"**{egg_type.title()}** hatched in **{incubator_num.title()}**",
         url=message.jump_url,
-        description=f"{display_name} #{dex_number}",
+        description=f"{display_name} #{dex_number}\n\u200b",
         color=embed_color
     )
 
@@ -115,6 +133,7 @@ async def handle_res_egg_hatch(bot: discord.Client, message: discord.Message):
         rs_embed.set_image(url=embed_image_url)
     if embed_author_text:
         rs_embed.set_author(name=embed_author_text, icon_url=embed_author_icon_url)
+
     mon_value = await get_mon_value(bot, hatched_mon)
     if mon_value and mon_value.get("has_market_value"):
         last_seen = mon_value.get("last_seen")
@@ -127,8 +146,14 @@ async def handle_res_egg_hatch(bot: discord.Client, message: discord.Message):
             value=current_listing,
             inline=False
         )
+        debug_log(f"Added market value to announcement: {current_listing!r}.")
+    else:
+        debug_log(f"No market value available for {hatched_mon}.")
+
+    debug_log(f"Sending rare-spawn announcement to channel {rarespawn_channel}.")
     await send_webhook(
         bot=bot,
         channel=rarespawn_channel,
         embed=rs_embed
     )
+    debug_log(f"Rare-spawn announcement sent for {hatched_mon}.")
