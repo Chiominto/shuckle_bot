@@ -1,21 +1,13 @@
+from datetime import datetime
 import re
 
 import discord
 
 from constants.celestial_constants import (
-    CELESTIAL_ROLES,
-    CELESTIAL_SERVER_ID,
     CELESTIAL_TEXT_CHANNELS,
-    DEFAULT_EMBED_COLOR,
-    KHY_USER_ID,
-    CELESTIAL_EMOJIS
 )
 from constants.aesthetics import Emojis
-from constants.paldea_galar_dict import rarity_meta
-from utils.functions.design_embed import design_embed
-from utils.functions.pokemeow_reply import get_pokemeow_reply_or_interaction_member
 from utils.functions.webhook_func import send_webhook
-from utils.logs.pretty_log import pretty_log
 from utils.functions.pokemon_func import get_mon_value, get_dex_number_by_name
 from utils.logs.debug_log import debug_log, enable_debug
 
@@ -126,7 +118,8 @@ async def handle_res_egg_hatch(bot: discord.Client, message: discord.Message):
         title=f"**{egg_type.title()}** hatched in **{incubator_num.title()}**",
         url=message.jump_url,
         description=f"{display_name} #{dex_number}\n\u200b",
-        color=embed_color
+        color=embed_color,
+        timestamp=datetime.now()
     )
 
     if embed_image_url:

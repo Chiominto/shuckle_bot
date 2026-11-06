@@ -1,20 +1,17 @@
 import re
+from datetime import datetime
 from urllib.parse import urlparse
 
 import discord
 
 from constants.aesthetics import Emojis
-from constants.celestial_constants import (
-    CELESTIAL_ROLES,
-    CELESTIAL_SERVER_ID,
-    CELESTIAL_TEXT_CHANNELS,
-    DEFAULT_EMBED_COLOR,
-    KHY_USER_ID,
-)
+from constants.celestial_constants import CELESTIAL_TEXT_CHANNELS
 from constants.paldea_galar_dict import rarity_meta
-from utils.functions.design_embed import design_embed, format_bulletin_desc
+from utils.functions.get_pokemon_gifs import get_pokemon_gif
 from utils.functions.pokemeow_reply import get_pokemeow_reply_member
+from utils.functions.pokemon_func import get_dex_number_by_name, get_mon_value
 from utils.functions.webhook_func import send_webhook
+from utils.logs import debug_log
 from utils.logs.pretty_log import pretty_log
 
 
@@ -53,7 +50,11 @@ async def send_code_claim_to_rs(
         if not member:
             # Slash command fallback: PokéMeow response has no reply reference,
             # but message.interaction carries the user who used the command.
-            if message.interaction and message.guild:
+            if (
+                message.interaction
+                and message.guild
+                and message.interaction.user
+            ):
                 member = message.guild.get_member(message.interaction.user.id)
             if not member:
                 pretty_log(
@@ -102,6 +103,8 @@ async def send_code_claim_to_rs(
         rarity_info = rarity_meta.get(rarity_key, rarity_meta["unknown"])
         color = rarity_info["color"]
         display_name = clean_pokemon_name
+        dex_number = get_dex_number_by_name(clean_pokemon_name)
+        dex_suffix = f" #{dex_number}" if dex_number is not None else ""
 
         # ──────────────────────────────────────────────
         #   ✅ Replace keyword with emoji (case-insensitive)
@@ -117,20 +120,36 @@ async def send_code_claim_to_rs(
         # ──────────────────────────────────────────────
         #   ✅ Build & send embed
         # ──────────────────────────────────────────────
-        footer_text = "Code claimed successfully!"
+        footer_text = f"Claimed in {message.guild.name}"
         embed = discord.Embed(
             title="Code Claimed",
             url=message.jump_url,
-            description=f"{member.mention} has claimed a code for **{display_name}**!",
-        )
-        embed = design_embed(
-            user=member,
-            embed=embed,
-            pokemon_name=pokemon_name_lower,
+            description=f"{member.mention} has claimed a code for **{display_name}{dex_suffix}**!\n\u200b",
             color=color,
-            footer_text=footer_text,
+            timestamp=datetime.now(),
         )
-        embed.color = color
+        embed.set_author(name=member.display_name, icon_url=member.display_avatar.url)
+        pokemon_gif = get_pokemon_gif(pokemon_name_lower)
+        if pokemon_gif:
+            embed.set_image(url=pokemon_gif)
+        embed.set_footer(
+            text=footer_text,
+            icon_url=(
+                message.guild.icon.url if message.guild and message.guild.icon else None
+            ),
+        )
+
+        mon_value = await get_mon_value(bot, pokemon_name_lower)
+        if mon_value and mon_value.get("has_market_value"):
+            last_seen = mon_value.get("last_seen")
+            last_seen_text = (
+                f"Value as of {last_seen}" if last_seen != "N/A" else "Value"
+            )
+            current_listing = mon_value.get("current_listing")
+            embed.add_field(name=last_seen_text, value=current_listing, inline=False)
+            debug_log(f"Added market value to announcement: {current_listing!r}.")
+        else:
+            debug_log(f"No market value available for {pokemon_name_lower}.")
         await send_webhook(
             bot=bot,
             channel=achievement_channel,
