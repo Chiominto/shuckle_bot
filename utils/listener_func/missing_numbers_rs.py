@@ -3,8 +3,7 @@ from urllib.parse import urlparse
 
 import discord
 
-from constants.celestial_constants import (CELESTIAL_TEXT_CHANNELS,
-                                           DEFAULT_EMBED_COLOR)
+from constants.celestial_constants import CELESTIAL_TEXT_CHANNELS, DEFAULT_EMBED_COLOR
 from utils.functions.webhook_func import send_webhook
 from utils.logs.pretty_log import pretty_log
 
@@ -96,7 +95,10 @@ async def send_missing_number_claim_to_rs(
         )
         if embed_image_url:
             embed.set_image(url=embed_image_url)
-        embed.set_author(name=member_name, icon_url=member.avatar.url if member and member.avatar else None)
+        embed.set_author(
+            name=member_name,
+            icon_url=member.avatar.url if member and member.avatar else None,
+        )
 
         await send_webhook(
             bot=bot,

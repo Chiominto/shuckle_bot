@@ -11,7 +11,7 @@ from utils.functions.get_pokemon_gifs import get_pokemon_gif
 from utils.functions.pokemeow_reply import get_pokemeow_reply_member
 from utils.functions.pokemon_func import get_dex_number_by_name, get_mon_value
 from utils.functions.webhook_func import send_webhook
-from utils.logs import debug_log
+from utils.logs.debug_log import debug_log
 from utils.logs.pretty_log import pretty_log
 
 
