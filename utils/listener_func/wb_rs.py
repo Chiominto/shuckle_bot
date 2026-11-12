@@ -5,8 +5,7 @@ from urllib.parse import urlsplit, urlunsplit
 import discord
 
 from constants.aesthetics import *
-from constants.celestial_constants import (CELESTIAL_TEXT_CHANNELS,
-                                           DEFAULT_EMBED_COLOR)
+from constants.celestial_constants import CELESTIAL_TEXT_CHANNELS, DEFAULT_EMBED_COLOR
 from constants.wb_constants import *
 from utils.functions.get_pokemon_gifs import get_pokemon_gif
 from utils.functions.webhook_func import send_webhook

@@ -78,8 +78,6 @@ triggers = {
     "incense_use": "Incense. Your server has received the following benefits",
     "hw_embed": "happy halloween pokemeow! participate in activities for rewards!",
 }
-
-CLAN_BANK_USER_NAMES = ["burgersbank"]
 CC_SHINY_BONUS_CHANNEL_ID = 1457171231445876746
 CODE_USE_PATTERN = re.compile(r"\byou used a code to claim\b", re.IGNORECASE)
 VALID_MATH_OPERANDS = ["+", "-", "*", "/", "(", ")", " ", "**", "%"]
@@ -353,9 +351,8 @@ class MessageCreateListener(commands.Cog):
             # Clan Bank Donation
             if (
                 content
-                and "gave" in content
-                and "PokeCoins" in content
-                and any(name in content for name in CLAN_BANK_USER_NAMES)
+                and "gave" in content.lower()
+                and "pokecoins" in content.lower()
             ):
                 pretty_log(
                     "info",

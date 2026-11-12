@@ -40,7 +40,7 @@ def extract_info(text: str | None):
 
 
 # 🎉────────────────────────────────────────────
-#   💠 Pokémon Code Claim Handler (Patched)
+#   💠 Missing Number Claim Handler
 # 🎉────────────────────────────────────────────
 async def send_missing_number_claim_to_rs(
     bot: discord.Client, message: discord.Message
@@ -108,7 +108,7 @@ async def send_missing_number_claim_to_rs(
 
         pretty_log(
             "ready",
-            f"Successfully posted Pokémon code claim for {member_name} (Message ID {message.id})",
+            f"Successfully posted missing number claim for {member_name} (Message ID {message.id})",
         )
 
     except Exception as e:
