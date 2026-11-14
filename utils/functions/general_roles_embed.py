@@ -8,6 +8,7 @@ from constants.celestial_constants import (
     CELESTIAL_TEXT_CHANNELS,
     DEFAULT_EMBED_COLOR,
 )
+from constants.world_boss_constants import WBEmojis
 from utils.logs.pretty_log import pretty_log
 
 EMBED_COLOR = DEFAULT_EMBED_COLOR
@@ -152,6 +153,7 @@ def build_general_roles_embed(guild: discord.Guild, user: discord.Member):
         snipe_giveaway_role = guild.get_role(CELESTIAL_ROLES.snipe_giveaways)
         golden_hour_role = guild.get_role(CELESTIAL_ROLES.golden_waters)
         trade_ads_role = guild.get_role(CELESTIAL_ROLES.trade_ads)
+        wb_spawn_ping = guild.get_role(CELESTIAL_ROLES.wb_spawn)
         ee_spawn_ping = guild.get_role(CELESTIAL_ROLES.ee_ping)
         calm_waters = guild.get_role(CELESTIAL_ROLES.calm_waters)
         shiny_bonus = guild.get_role(CELESTIAL_ROLES.shiny_bonus)
@@ -251,8 +253,17 @@ def build_general_roles_embed(guild: discord.Guild, user: discord.Member):
             )
             roles.append((emoji, patreon_auctions_ping))
 
+        if wb_spawn_ping and clan_member_role in user.roles:
+            emoji = WBEmojis.WB_Spawn
+            view.add_item(
+                ToggleRoleButton(
+                    role=wb_spawn_ping, label="WB Spawn Ping", emoji=emoji
+                )
+            )
+            roles.append((emoji, wb_spawn_ping))
+
         if ee_spawn_ping and clan_member_role in user.roles:
-            emoji = Emojis.gigantamax
+            emoji = WBEmojis.eet
             view.add_item(
                 ToggleRoleButton(role=ee_spawn_ping, label="EE Spawn Ping", emoji=emoji)
             )
