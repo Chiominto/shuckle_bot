@@ -358,7 +358,7 @@ async def extract_boss_from_wb_spawn_command(
         # Trigger other wb reminder
         await send_cc_other_wb_reminder(
             bot=bot,
-            boss=boss_name,
+            boss_name=boss_name,
             variant=variant,
             timestamp=battle_begins_time,
         )
@@ -417,7 +417,7 @@ async def extract_boss_from_wb_command_embed(
                 else:
                     await send_cc_other_wb_reminder(
                         bot=bot,
-                        boss=boss_name,
+                        boss_name=boss_name,
                         variant=variant,
                         timestamp=battle_begins_time,
                     )
