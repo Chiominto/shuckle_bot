@@ -12,10 +12,14 @@ CELESTIAL_BANK_USER_ID = 1491079044769513544
 CC_MH_REPORT_CHANNEL_ID = 1502156762466357338
 CC_SPOOKY_HOUR_CHANNEL_ID = 1559065705364852819
 CC_GUILD_ID = 1220718310455250996
+CC_WB_SPAWN_CHANNEL_ID = 1570719349915000942
+
+
 # 💦☁────────────────────────────────────────────💦☁
 #       CELESTIAL_TEXT_CHANNELS
 # 💦☁────────────────────────────────────────────💦☁
 class CELESTIAL_TEXT_CHANNELS:
+    wb_spawn = 1570715343481999390
     stellar_flex = 1502797917004759294
     clan_guide = 1493874658347450441
     summit_reports = 1502062266676285522
@@ -115,6 +119,7 @@ class CELESTIAL_CATEGORIES:
 #       CELESTIAL_ROLES
 # 💦☁────────────────────────────────────────────💦☁
 class CELESTIAL_ROLES:
+    wb_spawn = 1570715619580452884
     spooky_hour = 1558015988509704232
     snipe_giveaways = 1539220238657134654
     prism_badge = 1523990691879981086
@@ -207,3 +212,5 @@ class CELESTIAL_EMOJIS:
     lordfry = "<:LordFry:1490453099008102410>"
     sparkles = "<a:sparkles:1492709079108288574>"
     snorlax_coin = "<:snorlax_coin:1492785677518114906>"
+    gmax = "<:gigantamax:1493002883371630684>"
+    sgmax = "<:shinygigantamax:1493002893119459398>"

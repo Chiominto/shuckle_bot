@@ -7,7 +7,7 @@ from .celestial_members_cache import load_celestial_members_cache
 
 from .ping_message_id_cache import load_ping_message_id_cache
 from .webhook_url_cache import load_webhook_url_cache
-
+from .active_wb_cache import load_active_wb_cache
 
 async def load_all_cache(bot: discord.Client):
     """
@@ -26,6 +26,9 @@ async def load_all_cache(bot: discord.Client):
 
         # Load Webhook URL Cache
         await load_webhook_url_cache(bot)
+
+        # Load Active WB Cache
+        await load_active_wb_cache(bot)
 
     except Exception as e:
         pretty_log(

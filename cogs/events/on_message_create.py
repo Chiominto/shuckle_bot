@@ -7,12 +7,21 @@ from constants.celestial_constants import (
     CC_BUMP_CHANNEL_ID,
     CC_SERVER_ID,
     CC_SPOOKY_HOUR_CHANNEL_ID,
+    CC_WB_SPAWN_CHANNEL_ID,
     CELESTIAL_TEXT_CHANNELS,
-    KHY_USER_ID,
     HANA_USER_ID,
+    KHY_USER_ID,
     POKEMEOW_APPLICATION_ID,
 )
+from utils.listener_func.auto_wb_spawn import (
+    check_cc_bump_reminder,
+    check_cc_other_wb_reminder,
+    check_ee_near_spawn_alert,
+    extract_boss_from_wb_command_embed,
+    extract_boss_from_wb_spawn_command,
+)
 from utils.listener_func.battle_frontier_ach import handle_battle_frontier_achievement
+from utils.listener_func.calculations import computation_listener
 from utils.listener_func.cc_spooky_hour_listener import handle_cc_spooky_hour_message
 from utils.listener_func.channel_boost import (
     boost_channel_listener,
@@ -21,11 +30,9 @@ from utils.listener_func.channel_boost import (
 from utils.listener_func.channel_myboost_listener import my_boosted_channel_listener
 from utils.listener_func.clan_invite_listener import clan_invite_listener
 from utils.listener_func.code_use_listener import send_code_claim_to_rs
-from utils.listener_func.ee_spawn_listener import (
-    check_cc_bump_reminder,
-    check_ee_near_spawn_alert,
-    extract_boss_from_wb_command_embed,
-    extract_boss_from_wb_spawn_command,
+from utils.listener_func.donation_listener import (
+    clan_donate_listener,
+    give_command_listener,
 )
 from utils.listener_func.golden_stone_listener import golden_stone_listener
 from utils.listener_func.icon_unlock_listener import icon_unlock_listener
@@ -35,27 +42,22 @@ from utils.listener_func.incense_listener import (
     incense_use_handler,
     server_has_incense_handler,
 )
+from utils.listener_func.market_snipe_filter import should_delete_market_message
+from utils.listener_func.message_listener_debug import handle_test_message
+from utils.listener_func.missing_numbers_rs import send_missing_number_claim_to_rs
+from utils.listener_func.ms_reports import relay_meowsummit_reports
 from utils.listener_func.promo_claim_listener import promo_claim_listener
+from utils.listener_func.res_egg_listener import handle_res_egg_hatch
 from utils.listener_func.shiny_bonus_listener import (
     handle_pokemeow_global_bonus,
     read_shiny_bonus_timestamp_from_cc_channel,
 )
+from utils.listener_func.spooky_hour_listener import handle_spooky_hour_hw_embed
 from utils.listener_func.unown_unlocks import process_unown_unlock
 from utils.listener_func.wb_rs import handle_wb_rewards
 from utils.logs.pretty_log import pretty_log
 from utils.quick_codes.sync_donation_roles import sync_donation_roles
 from utils.quick_codes.sync_play_category_perms import sync_play_category_perms
-from utils.listener_func.calculations import computation_listener
-from utils.listener_func.donation_listener import (
-    clan_donate_listener,
-    give_command_listener,
-)
-from utils.listener_func.market_snipe_filter import should_delete_market_message
-from utils.listener_func.message_listener_debug import handle_test_message
-from utils.listener_func.missing_numbers_rs import send_missing_number_claim_to_rs
-from utils.listener_func.ms_reports import relay_meowsummit_reports
-from utils.listener_func.spooky_hour_listener import handle_spooky_hour_hw_embed
-from utils.listener_func.res_egg_listener import handle_res_egg_hatch
 
 CC_MH_REPORT_CHANNEL_ID = 1502156762466357338
 DEBUG_CHANNEL_ID = 1528225942604878125
@@ -203,6 +205,13 @@ class MessageCreateListener(commands.Cog):
                     label="CC Spooky Hour Listener",
                 )
                 await handle_cc_spooky_hour_message(bot=self.bot, message=message)
+            if message.channel.id == CC_WB_SPAWN_CHANNEL_ID:
+                pretty_log(
+                    "info",
+                    f"Detected message in CC WB spawn channel: Message ID {message.id}",
+                    label="CC WB Spawn Listener",
+                )
+                await check_cc_other_wb_reminder(bot=self.bot, message=message)
 
         # ————————————————————————————————
         # 🐢 Message Variables
@@ -349,11 +358,7 @@ class MessageCreateListener(commands.Cog):
             await clan_donate_listener(self.bot, message)
         if message.channel.id == CELESTIAL_TEXT_CHANNELS.donations:
             # Clan Bank Donation
-            if (
-                content
-                and "gave" in content.lower()
-                and "pokecoins" in content.lower()
-            ):
+            if content and "gave" in content.lower() and "pokecoins" in content.lower():
                 pretty_log(
                     "info",
                     f"Detected clan bank donation message: {content}",
@@ -458,7 +463,10 @@ class MessageCreateListener(commands.Cog):
         # 🌟────────────────────────────────────────────
         #   💠 My Boosted Channel Listener
         # 🌟────────────────────────────────────────────
-        if first_embed_title and triggers["channel_my_boost"].lower() in first_embed_title.lower():
+        if (
+            first_embed_title
+            and triggers["channel_my_boost"].lower() in first_embed_title.lower()
+        ):
 
             try:
                 await my_boosted_channel_listener(bot=self.bot, message=message)
@@ -550,6 +558,7 @@ class MessageCreateListener(commands.Cog):
                     "critical",
                     f"Failed processing Research Lab egg hatch from message ID {getattr(message, 'id', 'unknown')}: {e}",
                 )
+
 
 # 🟣────────────────────────────────────────────
 #         🐢 Setup Function

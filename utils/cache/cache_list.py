@@ -66,3 +66,15 @@ ping_message_id_cache: dict[str, int] = {}
 # type: message_id,
 #   ...
 # }
+
+# 🧩────────────────────────────────────────────
+#        ⚡ Active World Boss Cache
+# 🧩────────────────────────────────────────────
+active_wb_cache: dict[str, dict[str, int | str]] = {}
+# Structure:
+# active_wb_cache = {
+# "wb_timestamp": {
+#     "boss_name": str,
+#     "wb_timestamp": int,
+# },
+# }
