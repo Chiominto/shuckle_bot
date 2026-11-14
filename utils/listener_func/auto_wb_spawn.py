@@ -133,7 +133,6 @@ async def check_cc_bump_reminder(bot: commands.Bot, message: discord.Message):
     await message.add_reaction(CHECK_EMOJI)
 
 
-
 async def check_cc_other_wb_reminder(bot: commands.Bot, message: discord.Message):
     embed = message.embeds[0] if message.embeds else None
     if not embed:
@@ -655,8 +654,7 @@ async def remove_buttons_after_delay(message: discord.Message, delay=300):
 
 
 # -------------------- Persistent cache --------------------
-CACHE_FILE = "data/ee_votes_cache.json"
-
+CACHE_FILE = "constants/ee_votes_cache.json"
 last_seen_votes = {}
 near_spawn_alert_cache = set()
 
