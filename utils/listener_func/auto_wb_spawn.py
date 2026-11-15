@@ -591,7 +591,7 @@ async def auto_wb_ping(
                 f"- **GUIDE:** `{getattr(WBGuide, key, 'No guide available.')}`\n"
                 f"{start_timestamp_line}"
                 f"For more info: Use command `!wb` or `!wbi`\n\n"
-                # f"To get pings for a specific wb: Use `/wb-sub add`"
+                f"To get pings for a specific wb: Use `/wb-sub add`"
             ),
             color=color,
         )
