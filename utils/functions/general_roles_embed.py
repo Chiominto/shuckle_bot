@@ -163,6 +163,7 @@ def build_general_roles_embed(guild: discord.Guild, user: discord.Member):
         patreon_auctions_ping = guild.get_role(CELESTIAL_ROLES.patreon_auctions_ping)
         as_spawn_ping = guild.get_role(CELESTIAL_ROLES.as_spawn_ping)
         as_rare_spawn_ping = guild.get_role(CELESTIAL_ROLES.as_rarespawn_ping)
+        burger_shop_ping = guild.get_role(CELESTIAL_ROLES.burger_shop)
 
         roles = []
 
@@ -275,6 +276,13 @@ def build_general_roles_embed(guild: discord.Guild, user: discord.Member):
                 ToggleRoleButton(role=as_spawn_ping, label="AS Spawn Ping", emoji=emoji)
             )
             roles.append((emoji, as_spawn_ping))
+
+        if burger_shop_ping and clan_member_role in user.roles:
+            emoji = "🍔"
+            view.add_item(
+                ToggleRoleButton(role=burger_shop_ping, label="Burger Shop Ping", emoji=emoji)
+            )
+            roles.append((emoji, burger_shop_ping))
 
         if as_rare_spawn_ping:
             emoji = Emojis.premierball
