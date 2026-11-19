@@ -10,7 +10,12 @@ from utils.logs.pretty_log import pretty_log
 
 TESTING = False  # Temporarily disabled to test if reactions fire at all
 # enable_debug(f"{__name__}.on_reaction_add")
-
+CATEGORIES_TO_IGNORE = [
+    1490875682639843461,  # Market Place
+    1492031927417307156,  # Inner Circle
+    1490427928134291566,  # Meow District
+    1490598993393352704,  # Admin Category
+]
 
 # 🟣────────────────────────────────────────────
 #         🐢 Reaction Handler Cog
@@ -43,6 +48,10 @@ class ReactionListener(commands.Cog):
             channel = guild.get_channel(payload.channel_id)
             if not channel:
                 debug_log(f"[SKIP] Channel {payload.channel_id} not found")
+                return
+
+            if channel.category_id in CATEGORIES_TO_IGNORE:
+                debug_log(f"[SKIP] Channel {payload.channel_id} is in ignored category {channel.category_id}")
                 return
 
             message = await channel.fetch_message(payload.message_id)

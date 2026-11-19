@@ -80,11 +80,8 @@ async def fetch_message_from_link_func(
                 path.unlink(missing_ok=True)
             except Exception as e:
                 pretty_log("error", f"[fetch_message] Temp file cleanup failed: {e}")
-            if loader:
-                try:
-                    await loader.stop(delete=True)
-                except Exception:
-                    pass
+        if loader:
+            await loader.success(delete=True)
 
     # [💙 READY] Parse link → channel_id + message_id
     try:
