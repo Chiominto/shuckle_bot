@@ -44,6 +44,7 @@ async def handle_server_booster_role_remove(
     # Make exemption for staff members
     staff_role = member.guild.get_role(CELESTIAL_ROLES.staff)
     khy_role = member.guild.get_role(CELESTIAL_ROLES.aurora_aide_)
+    elite_server_booster_role = member.guild.get_role(CELESTIAL_ROLES.elite_server_booster)
     if staff_role in member.roles or khy_role in member.roles:
         pretty_log(
             message=f"Member '{member.display_name}' is staff or top grinder; skipping custom role deletion on server booster removal.",
@@ -51,6 +52,21 @@ async def handle_server_booster_role_remove(
             label="Server Booster Role Remove",
         )
         return
+    
+    # Remove Elite Server Booster role if present
+    if elite_server_booster_role in member.roles:
+        try:
+            await member.remove_roles(elite_server_booster_role, reason="Server booster role removed.")
+            pretty_log(
+                message=f"Removed elite server booster role from member '{member.display_name}' after server booster role removal.",
+                tag="info",
+                label="Server Booster Role Remove",
+            )
+        except Exception as e:
+            pretty_log(
+                message=f"Failed to remove elite server booster role from member '{member.display_name}': {e}",
+                tag="error",
+            )
 
     # Fetch custom role ID from DB
     custom_role_id = await fetch_custom_role_id(bot, member)
