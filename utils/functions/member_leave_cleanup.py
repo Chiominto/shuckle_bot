@@ -127,6 +127,45 @@ def _review_embed(review) -> discord.Embed:
     return embed
 
 
+async def _clear_missing_pending_reviews(bot: discord.Client, channel: discord.TextChannel):
+    async with bot.pg_pool.acquire() as conn:
+        reviews = await conn.fetch(
+            "SELECT id, message_id FROM member_cleanup_reviews WHERE status = 'pending'"
+        )
+
+    active_review_ids = []
+    for review in reviews:
+        message_id = review["message_id"]
+        if message_id is not None:
+            try:
+                await channel.fetch_message(message_id)
+            except discord.NotFound:
+                pass
+            else:
+                active_review_ids.append(review["id"])
+                continue
+
+        async with bot.pg_pool.acquire() as conn:
+            await conn.execute(
+                """
+                UPDATE member_cleanup_reviews
+                SET status = 'cancelled', candidates = '{}'::jsonb
+                WHERE id = $1 AND status = 'pending'
+                """,
+                review["id"],
+            )
+        pretty_log(
+            "warn",
+            f"Cancelled cleanup review {review['id']} because its preview message is missing.",
+        )
+
+    if active_review_ids:
+        raise RuntimeError(
+            f"Cleanup review {active_review_ids[0]} is still active. "
+            "Use its Cancel button before starting another preview."
+        )
+
+
 async def create_member_cleanup_preview(bot: discord.Client):
     await bot.wait_until_ready()
     guild = bot.get_guild(CELESTIAL_SERVER_ID)
@@ -135,6 +174,7 @@ async def create_member_cleanup_preview(bot: discord.Client):
     channel = guild.get_channel(CELESTIAL_TEXT_CHANNELS.commands)
     if not isinstance(channel, discord.TextChannel):
         raise RuntimeError("Commands channel is unavailable; cleanup preview was not created.")
+    await _clear_missing_pending_reviews(bot, channel)
     member_ids = await _member_ids(guild)
     candidates, tables, skipped = await _build_preview(bot, member_ids)
     async with bot.pg_pool.acquire() as conn:
@@ -144,7 +184,9 @@ async def create_member_cleanup_preview(bot: discord.Client):
                 "SELECT EXISTS(SELECT 1 FROM member_cleanup_reviews WHERE status = 'pending')"
             )
             if pending:
-                raise RuntimeError("A cleanup review is already pending; finish or cancel it first.")
+                raise RuntimeError(
+                    "A cleanup review is already pending. Use its Cancel button first."
+                )
             review = await conn.fetchrow(
                 """
                 INSERT INTO member_cleanup_reviews (candidates, tables, skipped)

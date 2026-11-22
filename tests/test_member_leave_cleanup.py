@@ -198,6 +198,48 @@ class MemberCleanupTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(view.review_id, 7)
         self.assertEqual(bot.add_view.call_args.kwargs["message_id"], 42)
 
+    async def test_deleted_preview_cancels_stale_pending_review(self):
+        response = SimpleNamespace(status=404, reason="Not Found")
+        missing = discord.NotFound(
+            response, {"message": "Unknown Message", "code": 10008}
+        )
+        conn = SimpleNamespace(
+            fetch=AsyncMock(return_value=[{"id": 7, "message_id": 42}]),
+            execute=AsyncMock(return_value="UPDATE 1"),
+        )
+        bot = SimpleNamespace(pg_pool=SimpleNamespace(acquire=lambda: context_manager(conn)))
+        channel = SimpleNamespace(fetch_message=AsyncMock(side_effect=missing))
+        with patch.object(cleanup, "pretty_log"):
+            await cleanup._clear_missing_pending_reviews(bot, channel)
+        self.assertIn("status = 'cancelled'", conn.execute.await_args.args[0])
+        self.assertEqual(conn.execute.await_args.args[1], 7)
+
+    async def test_existing_preview_keeps_pending_review_active(self):
+        conn = SimpleNamespace(
+            fetch=AsyncMock(return_value=[{"id": 7, "message_id": 42}]),
+            execute=AsyncMock(),
+        )
+        bot = SimpleNamespace(pg_pool=SimpleNamespace(acquire=lambda: context_manager(conn)))
+        channel = SimpleNamespace(fetch_message=AsyncMock(return_value=object()))
+        with self.assertRaisesRegex(RuntimeError, "still active"):
+            await cleanup._clear_missing_pending_reviews(bot, channel)
+        conn.execute.assert_not_awaited()
+
+    async def test_unable_to_check_preview_does_not_clear_pending_review(self):
+        failure = discord.Forbidden(
+            SimpleNamespace(status=403, reason="Forbidden"),
+            {"message": "Missing Access", "code": 50001},
+        )
+        conn = SimpleNamespace(
+            fetch=AsyncMock(return_value=[{"id": 7, "message_id": 42}]),
+            execute=AsyncMock(),
+        )
+        bot = SimpleNamespace(pg_pool=SimpleNamespace(acquire=lambda: context_manager(conn)))
+        channel = SimpleNamespace(fetch_message=AsyncMock(side_effect=failure))
+        with self.assertRaises(discord.Forbidden):
+            await cleanup._clear_missing_pending_reviews(bot, channel)
+        conn.execute.assert_not_awaited()
+
     async def test_manual_trigger_requires_allowlisted_user(self):
         ctx = SimpleNamespace(
             guild=SimpleNamespace(id=cleanup.CELESTIAL_SERVER_ID),
