@@ -1,3 +1,4 @@
+import asyncpg
 import discord
 
 from utils.logs.pretty_log import pretty_log
@@ -5,13 +6,24 @@ from utils.logs.pretty_log import pretty_log
 TABLE_NAMES = [
     "berry_reminder",
     "celestial_members",
+    "custom_roles",
     "ev_tracker",
     "giveaway_entries",
     "market_alerts",
-    "personal_roles",
     "user_alerts",
     "watering_can",
-    "custom_roles",
+    "factions",
+    "pokemeow_timer",
+    "server_cooldowns",
+    "snipe_ga_wins",
+    "special_battle_timers",
+    "temp_roles",
+    "user_alerts",
+    "user_wb_ping",
+    "utilities",
+    "watering_can",
+    "weekly_goal_tracker"
+
 ]
 
 
@@ -39,15 +51,25 @@ async def update_username_in_dbs(bot: discord.Client, user_id: int, new_username
 async def remove_user_from_dbs(bot: discord.Client, user_id: int):
     try:
         async with bot.pg_pool.acquire() as conn:
+            failed_tables = []
             for table in TABLE_NAMES:
-                await conn.execute(
-                    f"DELETE FROM {table} WHERE user_id = $1;",
-                    user_id,
+                try:
+                    await conn.execute(
+                        f"DELETE FROM {table} WHERE user_id = $1;",
+                        user_id,
+                    )
+                except asyncpg.PostgresError as e:
+                    failed_tables.append(table)
+                    pretty_log(
+                        tag="error",
+                        message=f"Failed to remove user {user_id} from table '{table}': {e}",
+                        include_trace=True,
+                    )
+            if not failed_tables:
+                pretty_log(
+                    tag="info",
+                    message=f"Removed user {user_id} from all relevant database tables",
                 )
-            pretty_log(
-                tag="info",
-                message=f"Removed user {user_id} from all relevant database tables",
-            )
     except Exception as e:
         pretty_log(
             tag="error",

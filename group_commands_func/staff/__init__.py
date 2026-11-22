@@ -4,6 +4,8 @@ from .role_members import role_members_func
 from .unban import unban_func
 from .update_member import update_member_func
 from .whois import whois_func
+from .clan_remove import clan_remove_func
+
 
 __all__ = [
     "update_member_func",
@@ -12,4 +14,5 @@ __all__ = [
     "role_members_func",
     "whois_func",
     "clan_members_func",
+    "clan_remove_func",
 ]

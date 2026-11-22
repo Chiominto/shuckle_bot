@@ -226,7 +226,17 @@ async def auto_clan_remove_func(
             )
             return
 
-        await remove_celestial_member(bot=bot, user_id=user_id)
+        removal_error = await remove_celestial_member(bot=bot, user_id=user_id)
+        if removal_error:
+            pretty_log(
+                tag="error",
+                message=(
+                    f"Failed to remove {member.display_name} from the clan database: "
+                    f"{removal_error}"
+                ),
+                label="🛟 Clan Remove",
+            )
+            return
 
         await asyncio.sleep(1.5)  # 💤 Tiny pause for flow
         if context == "clan_leave":
@@ -291,6 +301,7 @@ async def auto_clan_remove_handler(
         roles = get_roles(
             guild,
             CELESTIAL_ROLES.former_clan_member,
+            CELESTIAL_ROLES.npc,
             CELESTIAL_ROLES.celestialnova_,
             CELESTIAL_ROLES.top_catcher,
             CELESTIAL_ROLES.nebula,
@@ -317,12 +328,20 @@ async def auto_clan_remove_handler(
 
         # 🐾 Unpack roles
         Former_Clan_Member_Role = roles[0]
-        roles_to_remove = roles[1:]
+        NPC_Role = roles[1]
+        roles_to_remove = roles[2:]
 
         if Former_Clan_Member_Role is None:
             pretty_log(
                 "warn",
                 "⚠️ Former clan member role is missing; skipping clan removal role updates.",
+            )
+            return False
+
+        if NPC_Role is None:
+            pretty_log(
+                "warn",
+                "⚠️ NPC role is missing; skipping clan removal role updates.",
             )
             return False
 
@@ -333,7 +352,7 @@ async def auto_clan_remove_handler(
 
         # 🪄 Apply role changes
         try:
-            await member.add_roles(Former_Clan_Member_Role)
+            await member.add_roles(Former_Clan_Member_Role, NPC_Role)
             await member.remove_roles(*filter(None, roles_to_remove))
         except discord.errors.NotFound as e:
             pretty_log(

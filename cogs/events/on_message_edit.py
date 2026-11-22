@@ -3,7 +3,7 @@ import re
 import discord
 from discord.ext import commands
 
-from constants.celestial_constants import CC_SERVER_ID, POKEMEOW_APPLICATION_ID
+from constants.celestial_constants import POKEMEOW_APPLICATION_ID
 from utils.listener_func.clan_invite_listener import clan_invite_listener
 from utils.listener_func.clan_remove_listener import (
     process_clan_kick_message,
@@ -111,7 +111,11 @@ class OnMessageEditCog(commands.Cog):
         # 🪓────────────────────────────────────────────
         #        ⚔️ Handle Clan Kick Command
         # 🪓────────────────────────────────────────────
-        if content and triggers["clan_kick"].search(content_lower):
+        if (
+            after.author.id == POKEMEOW_APPLICATION_ID
+            and content
+            and triggers["clan_kick"].search(content_lower)
+        ):
             try:
                 pretty_log(
                     "info",
@@ -130,7 +134,11 @@ class OnMessageEditCog(commands.Cog):
         # 💙───────────────────────────────────────────────💙
         # 🫧 Clan Leave Processing
         # 💙───────────────────────────────────────────────💙
-        if content and triggers["clan_leave"] in content_lower:
+        if (
+            after.author.id == POKEMEOW_APPLICATION_ID
+            and content
+            and triggers["clan_leave"] in content_lower
+        ):
             try:
                 await process_clan_leave_command(bot=self.bot, message=after)
                 pretty_log(

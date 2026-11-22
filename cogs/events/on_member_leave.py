@@ -7,7 +7,7 @@ from constants.celestial_constants import CELESTIAL_TEXT_CHANNELS
 from utils.logs.pretty_log import pretty_log
 from utils.cache.cache_list import celestial_members_cache
 from utils.functions.webhook_func import send_webhook
-
+from utils.db.general_db import remove_user_from_dbs
 LOG_CHANNEL_ID = CELESTIAL_TEXT_CHANNELS.server_logs
 
 
@@ -59,6 +59,8 @@ class OnMemberLeaveCog(commands.Cog):
                 ),
                 label="MemberLeave",
             )
+
+        await remove_user_from_dbs(bot=self.bot, user_id=member.id)
 
         pretty_log(
             tag="info",

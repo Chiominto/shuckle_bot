@@ -588,7 +588,9 @@ async def remove_celestial_member(
         return error_message
 
 
-async def fetch_clan_channel_id(bot: discord.Client, user_id: int):
+async def fetch_clan_channel_id(
+    bot: discord.Client, user_id: int, *, raise_on_error: bool = False
+):
     """Fetch the clan channel ID for a given celestial member."""
     try:
         async with bot.pg_pool.acquire() as conn:
@@ -619,6 +621,8 @@ async def fetch_clan_channel_id(bot: discord.Client, user_id: int):
             tag="error",
             include_trace=True,
         )
+        if raise_on_error:
+            raise
         return None
 
 

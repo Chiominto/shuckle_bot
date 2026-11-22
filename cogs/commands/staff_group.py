@@ -215,6 +215,34 @@ class StaffGroup(commands.Cog):
         )
     clan_members.extras = {"category": "Staff"}
 
+    # 🤍───────────────────────────────────────
+    # 📌 /staff clan-remove
+    # 🤍───────────────────────────────────────
+    @staff.command(
+        name="clan-remove",
+        description="Remove a member from the Celestial Clan.",
+    )
+    @owner_and_co_owner_only()
+    @app_commands.describe(
+        member="The member to remove from the clan",
+    )
+    async def clan_remove(
+        self,
+        interaction: discord.Interaction,
+        member: discord.Member,
+    ):
+        slash_cmd_name = "staff clan-remove"
+
+        # Call the centralized clan remove logic
+        await run_command_safe(
+            bot=self.bot,
+            interaction=interaction,
+            slash_cmd_name=slash_cmd_name,
+            command_func=clan_remove_func,  # your main logic lives here
+            member=member,
+        )
+    clan_remove.extras = {"category": "Staff"}
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(StaffGroup(bot))

@@ -1,7 +1,10 @@
+import asyncpg
+
 from discord.ext import commands
 from utils.logs.pretty_log import pretty_log
 from utils.background_tasks.scheduled_tasks.battle_tower_reminder import BattleTowerPingButton
 from utils.background_tasks.scheduled_tasks.os_lotto_reminder import LottoReminderView
+from utils.functions.member_leave_cleanup import setup_member_cleanup
 # 💧────────────────────────────────────────────
 #      Persistent Giveaway Views Registration
 # 💧────────────────────────────────────────────
@@ -53,5 +56,10 @@ async def register_persistent_views(bot: commands.Bot) -> int:
 
     # 🏰 Battle Tower Ping Toggle Button
     try_add(view_instance=BattleTowerPingButton())
+
+    try:
+        await setup_member_cleanup(bot)
+    except (asyncpg.PostgresError, RuntimeError) as e:
+        pretty_log("error", f"Failed to restore cleanup review buttons: {e}", include_trace=True)
 
     return len(added_views)

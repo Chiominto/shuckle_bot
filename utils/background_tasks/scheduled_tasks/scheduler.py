@@ -10,6 +10,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from utils.logs.pretty_log import pretty_log
+from utils.functions.member_leave_cleanup import scheduled_member_cleanup_preview
 
 from .battle_tower_reminder import send_battle_tower_closing_reminder
 from .donation_role_reset import reset_donation_roles
@@ -129,6 +130,21 @@ async def setup_schedulers(bot):
         schedules.append(f"📊 Monthly Stats Reminder scheduled for {readable_next_run}")
     except Exception as e:
         pretty_log("error", f"Failed to schedule Monthly Stats Reminder: {e}")
+
+    try:
+        cleanup_review = scheduler_manager.add_cron_job(
+            scheduled_member_cleanup_preview,
+            name="monthly_member_cleanup_review",
+            day_of_month=1,
+            hour=0,
+            minute=0,
+            timezone=NYC,
+            args=[bot],
+        )
+        readable_next_run = format_next_run_manila(cleanup_review.next_run_time)
+        schedules.append(f"🧹 Database cleanup review scheduled for {readable_next_run}")
+    except Exception as e:
+        pretty_log("error", f"Failed to schedule database cleanup review: {e}")
 
     schedule_checklist(schedules)
 

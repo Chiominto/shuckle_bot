@@ -1,5 +1,6 @@
 import re
 
+import asyncpg
 import discord
 from discord.ext import commands
 
@@ -8,6 +9,7 @@ from constants.celestial_constants import (
     CC_SERVER_ID,
     CC_SPOOKY_HOUR_CHANNEL_ID,
     CC_WB_SPAWN_CHANNEL_ID,
+    CELESTIAL_SERVER_ID,
     CELESTIAL_TEXT_CHANNELS,
     HANA_USER_ID,
     KHY_USER_ID,
@@ -54,8 +56,13 @@ from utils.listener_func.shiny_bonus_listener import (
 )
 from utils.listener_func.spooky_hour_listener import handle_spooky_hour_hw_embed
 from utils.listener_func.unown_unlocks import process_unown_unlock
+from utils.listener_func.username_change import handle_username_change
 from utils.listener_func.wb_rs import handle_wb_rewards
 from utils.logs.pretty_log import pretty_log
+from utils.functions.member_leave_cleanup import (
+    MANUAL_CLEANUP_USER_IDS,
+    create_member_cleanup_preview,
+)
 from utils.quick_codes.sync_donation_roles import sync_donation_roles
 from utils.quick_codes.sync_play_category_perms import sync_play_category_perms
 
@@ -91,6 +98,24 @@ VALID_MATH_OPERANDS = ["+", "-", "*", "/", "(", ")", " ", "**", "%"]
 class MessageCreateListener(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+
+    @commands.command(name="db_cleanup")
+    async def db_cleanup(self, ctx: commands.Context):
+        if (
+            ctx.guild is None
+            or ctx.guild.id != CELESTIAL_SERVER_ID
+            or ctx.author.bot
+            or ctx.message.webhook_id
+            or ctx.author.id not in MANUAL_CLEANUP_USER_IDS
+        ):
+            await ctx.reply("You are not authorized to start a cleanup preview.")
+            return
+        try:
+            await create_member_cleanup_preview(self.bot)
+            await ctx.reply("Cleanup preview sent to the commands channel.")
+        except (asyncpg.PostgresError, discord.HTTPException, RuntimeError, ValueError) as e:
+            pretty_log("error", f"Failed to create cleanup preview: {e}", include_trace=True)
+            await ctx.reply("Cleanup preview failed; check the bot logs.")
 
     def debug_log_channel_message(self, message: discord.Message):
         """Temporary: log what the bot receives in DEBUG_CHANNEL_ID."""
@@ -558,6 +583,25 @@ class MessageCreateListener(commands.Cog):
                     "critical",
                     f"Failed processing Research Lab egg hatch from message ID {getattr(message, 'id', 'unknown')}: {e}",
                 )
+        # ————————————————————————————————
+        # 🩵 Username Change Handler
+        # ————————————————————————————————
+        if (
+            content
+            and message.author.id == POKEMEOW_APPLICATION_ID
+            and "You spent <:PokeCoin:666879070650236928> **100,000** "
+            "to change your username to" in content
+        ):
+            updated = await handle_username_change(bot=self.bot, message=message)
+            pretty_log(
+                "info" if updated else "warning",
+                (
+                    f"Updated username for message ID {message.id}"
+                    if updated
+                    else f"No database update occurred for username change message ID {message.id}"
+                ),
+                label="Username Change Handler",
+            )
 
 
 # 🟣────────────────────────────────────────────
