@@ -15,6 +15,7 @@ TABLE_NAMES = [
     "factions",
     "pokemeow_timer",
     "server_cooldowns",
+    "server_currency",
     "snipe_ga_wins",
     "special_battle_timers",
     "temp_roles",
